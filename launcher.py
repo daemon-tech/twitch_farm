@@ -36,3 +36,4 @@ def start_main():
 
 if __name__ == "__main__":
 	load()
+	start_main()
