@@ -1,5 +1,8 @@
 #Jetbrains Projectfolder
-\.idea\
+/.idea/
 
-#.save files
+#.save files from some IDE
 *.save*
+
+# Python Cache | Byte-compiled / optimized / DLL files
+__pycache__/
