@@ -8,6 +8,7 @@ import sys
 
 from pyfiglet import Figlet
 from socket import *
+from socket import gethostbyname
 
 subprocess.call('clear', shell=True)
 
@@ -31,22 +32,30 @@ def banner():
 	print(bcolors.PURPLE + title.renderText("TFARMER"))
 
 class irc:
+	from modules.colors import bcolors
+	
 	def __init__(self, server, port, token, user):
 		self.server = server
 		self.port = port
 		self.token = token
-		self.user = username
+		self.user = user
 		
-	def connection(server, port):
-		self.ircsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.ircsocket.connect((self.server, self.port))
-		
+	def connection(self, server, port):
+		try:
+			ircsocket = socket(AF_INET, SOCK_STREAM)
+			ircsocket.connect((server, port))
+		except:
+			print(bcolors.BLUE + "DEBUG: Connection failed")
+			
 #ask [server, por, token, user]
 def input_data():
+	global data
 	data = []
 	for i in range(1, 4+1):
 		if i == 1:
-			data_input = input("Server Input: ")
+			server_input = input("Server Input: ")
+			data_input = gethostbyname(server_input)
+			data_input = int(data_input)
 			data.append(data_input)
 		elif i == 2:
 			data_input = input("Port Input: ")
@@ -55,9 +64,10 @@ def input_data():
 			data_input = input("OAUTH Token Input: ")
 			data.append(data_input)
 		elif i == 4:
-			data_input = input("Username Input")
+			data_input = input("Username Input: ")
 			data.append(data_input)
 	print(data)
+	print(" ")
 
 	
 if __name__ == "__main__":
@@ -65,4 +75,5 @@ if __name__ == "__main__":
     banner()
     input_data()
     bot = irc(data[0], data[1], data [2], data[3])
+    bot.connection(data[0], data[1])
     
