@@ -2,6 +2,7 @@ import json
 import time
 import os
 import subprocess
+import socket
 import pyfiglet
 import sys
 
@@ -23,13 +24,38 @@ def check_color():
 	except:
 		print(f"DEBUG: lib/db/modules/colors.py missing")
 		exit()
-		
+
 def banner():
 	from modules.colors import bcolors
 	title = Figlet(font="banner3-D")
 	print(bcolors.PURPLE + title.renderText("TFARMER"))
 
+class bot:
+	def __init__(self, server, port, token, user):
+		self.server = server
+		self.port = port
+		self.token = token
+		self.user = username
+
+def input_data():
+	data = []
+	for i in range(1, 4+1):
+		if i == 1:
+			data_input = input("Server Input: ")
+			data.append(data_input)
+		elif i == 2:
+			data_input = input("Port Input: ")
+			data.append(data_input)
+		elif i == 3:
+			data_input = input("OAUTH Token Input: ")
+			data.append(data_input)
+		elif i == 4:
+			data_input = input("Username Input")
+			data.append(data_input)
+	print(data)
+	
 if __name__ == "__main__":
-    #init_update()
     check_color()
     banner()
+    input_data()
+    
