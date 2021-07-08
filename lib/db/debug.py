@@ -5,6 +5,7 @@ import subprocess
 import socket
 import pyfiglet
 import sys
+import asyncio
 
 from pyfiglet import Figlet
 from socket import *
@@ -32,7 +33,6 @@ def banner():
 	print(bcolors.PURPLE + title.renderText("TFARMER"))
 
 class irc:
-	from modules.colors import bcolors
 	
 	def __init__(self, server, port, token, user):
 		self.server = server
@@ -41,11 +41,15 @@ class irc:
 		self.user = user
 		
 	def connection(self, server, port):
+		from modules.colors import bcolors
+		
 		try:
+			print(bcolors.BLUE + "DEBUG: Connection failed")
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
+			print("DEBUG: Connection success")
 		except:
-			print(BLUE + "DEBUG: Connection failed")
+			print(bcolors.BLUE + "DEBUG: Connection failed")
 			
 #ask [server, por, token, user]
 def input_data():
@@ -58,7 +62,8 @@ def input_data():
 			#data_input = int(data_input)
 			data.append(data_input)
 		elif i == 2:
-			data_input = input("Port Input: ")
+			port_input = input("Port Input: ")
+			data_input = int(port_input)
 			data.append(data_input)
 		elif i == 3:
 			data_input = input("OAUTH Token Input: ")
