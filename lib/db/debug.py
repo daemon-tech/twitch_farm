@@ -44,10 +44,9 @@ class irc:
 		from modules.colors import bcolors
 		
 		try:
-			print(bcolors.BLUE + "DEBUG: Connection failed")
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
-			print("DEBUG: Connection success")
+			print("DEBUG: Connection success: {}, {}".format(server, port)
 		except:
 			print(bcolors.BLUE + "DEBUG: Connection failed")
 			
