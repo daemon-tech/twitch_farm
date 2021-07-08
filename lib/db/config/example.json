@@ -8,5 +8,6 @@
     "intelligencedi1",
 	"daem0nnnn"
   ],
-  "debug": true
+  "debug": false,
+  "quickstart": false
 }
