@@ -44,6 +44,7 @@ class irc:
 		from modules.colors import bcolors
 		
 		try:
+			global ircsocket
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
 			print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
@@ -65,10 +66,18 @@ class irc:
 					ircsocket.send(sock_channel.encode("utf-8"))
 					print(bcolors.PURPLE + "Joined Channel: {}".format(i))
 					print("Connected: TOKEN: {} USER: {} CHANNEL: {}".format(sock_token, sock_username, sock_channel))
+					ircmsg = ircsocket.recv(2048).decode("UTF-8")
+					ircmsg = ircmsg.strip('nr')
+					print(ircmsg)
 			except:
 				print(bcolors.RED + "DEBUG: #Authentification failed")
 		except:
 			print(bcolors.RED + "DEBUG: Connection failed")
+			
+	def connection_receive(self):
+		ircmsg = ircsocket.recv(2048).decode("UTF-8")
+		ircmsg = ircmsg.strip('nr')
+		print(ircmsg)
 			
 #ask [server, port, token, user]
 def input_data():
