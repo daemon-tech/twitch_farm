@@ -43,10 +43,8 @@ class irc:
 		from modules.colors import bcolors
 		
 		try:
-			print("debug: ircsocket")
 			global ircsocket
 			ircsocket = socket.socket()
-			print("DEBUG: ircsocket connect")
 			ircsocket.connect((server, port))
 			print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
 			try:
@@ -54,7 +52,6 @@ class irc:
 			except:
 				cFile = open('lib/db/config/channels.json')
 			channels = json.load(cFile)
-			print("DEBUG: loaded: channels = json.load(cFile)")
 			sock_token = "PASS {}\n".format(data[2])
 			sock_username = "NICK {}\n".format(data[3])
 			
