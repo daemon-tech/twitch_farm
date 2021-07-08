@@ -17,7 +17,7 @@ def load():
         import time
         import sys
     except ModuleNotFoundError:
-        print("SomeModules are not correctly installed.\n json;requests;argparser;time")
+        print("Some Modules are not correctly installed.\n json;requests;argparser;time")
         install = input("Want to install now? [y/n]")
         if install == "y" or install == "Y":
             if os.name != "nt":
@@ -36,5 +36,5 @@ def start_main():
         os.system("python3 lib/db/loader.py")
 
 if __name__ == "__main__":
-	load()
-	start_main()
+    load()
+    start_main()
