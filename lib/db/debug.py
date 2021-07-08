@@ -6,6 +6,7 @@ import socket
 import pyfiglet
 import sys
 import asyncio
+import logging
 
 from pyfiglet import Figlet
 from socket import *
@@ -71,14 +72,12 @@ class irc:
 		except:
 			print(bcolors.RED + "DEBUG: Connection failed")
 			
-	def connection_receive(self):
-		while True:
-			ircmsg = ircsocket.recv(2048).decode("UTF-8")
-			ircmsg = ircmsg.strip('nr')
-			if ircmsg.find("test") != -1:
-				ame = ircmsg.split('!',1)[0][1:]
-				message = ircmsg.split('test',1)[1].split(':',1)[1]
-				print(message)
+	def receive(self):
+		return ircsocket.recv(4096).decode("utf-8")
+	
+	def send(self, command, message):
+		c = "{} {}\r\n".format(command, message).encode("utf-8")
+		self.ircsocket.send(c)
 			
 #ask [server, port, token, user]
 def input_data():
@@ -130,7 +129,13 @@ if __name__ == "__main__":
 	print(bcolors.RED + "DEBUG: input_data()")
 	input_data()
 	print("DEBUG: bot = irc(data[0], data[1], data[2], data[3])") 
-	bot = irc(data[0], data[1], data [2], data[3])
+	get = irc(data[0], data[1], data [2], data[3])
 	print("DEBUG: bot.connection(data[0], data[1])")
-	bot.connection(data[0], data[1], data [2], data[3])
-    
+	get.connection(data[0], data[1], data [2], data[3])
+	
+	while True:
+		bot = irc(data[0], data[1], data [2], data[3])
+		buffer = bot.receive()
+		resp, buffer = buffer.split('\n', 1)
+		if resp.startswith('PING'):
+				bot.send("PONG", "")
