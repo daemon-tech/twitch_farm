@@ -108,28 +108,30 @@ if __name__ == "__main__":
 	bot = irc(data[0], data[1], data [2], data[3])
 	
 	while True:
-		time.sleep(1)
 		print(bcolors.RED + "DEBUG: buffer = bot.receive()")
 		buffer = bot.receive()
-		print("DEBUG: resp, buffer = buffer.split('\n', 1)")
-		print(buffer)
-		resp, buffer = buffer.split('\n', 1)
-		print("DEBUG: if resp.startswith('PING'):")
-		if resp.startswith('PING'):
+		if buffer is not None:
+			print("DEBUG: resp, buffer = buffer.split('\n', 1)")
+			print(buffer)
+			resp, buffer = buffer.split('\n', 1)
+			print("DEBUG: if resp.startswith('PING'):")
+		
+			if resp.startswith('PING'):
 				bot.send("PONG", "")
 				print("Pong send")
-		print("DEBUG: resplit = resp.strip().split()")
-		resplit = resp.strip().split()
-		print(f"DEBUG: resplit = resp.strip().split() {resplit}")
-		if resplit[1] == "PRIVMSG":
-			try:
-				msg = resp.strip().split(":", 2) # split(":", 2)
-				msg_split = msg[2].split(" ")
-				chan = msg[1].split("PRIVMSG")[1].strip()
-				user = msg[1].split("!")[0]
-				print("DEBUG: try")
-			except:
-				log(err_log, "******\n{} ER MSG:\n{}\n\nOF MSG:\n{}\n".format(msg, resp))
-				continue
-			if msg_split[0] == "test":
-				print(msg_split[0])
+			print("DEBUG: resplit = resp.strip().split()")
+			resplit = resp.strip().split()
+			print(f"DEBUG: resplit = resp.strip().split() {resplit}")
+		
+			if resplit[1] == "PRIVMSG":
+				try:
+					msg = resp.strip().split(":", 2) # split(":", 2)
+					msg_split = msg[2].split(" ")
+					chan = msg[1].split("PRIVMSG")[1].strip()
+					user = msg[1].split("!")[0]
+					print("DEBUG: try")
+				except:
+					log(err_log, "******\n{} ER MSG:\n{}\n\nOF MSG:\n{}\n".format(msg, resp))
+					continue
+				if msg_split[0] == "test":
+					print(msg_split[0])
