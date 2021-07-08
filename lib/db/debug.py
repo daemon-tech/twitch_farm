@@ -46,14 +46,26 @@ class irc:
 		try:
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
-			
 			print("DEBUG: Connection success: {}, {}".format(server, port))
-			print("DEBUG: Connection success")
 
 			cFile = open('config/channels.json')
 			channels = json.load(cFile)
-			for i in channels['channels']:
-				print(i)
+			sock_token = "PASS {}\n".format(data[2])
+			sock_username = "NICK {}\n".format(data[3])
+			
+			#Authentification
+			try:
+				sock.send(sock_token.encode("utf-8")
+				sock.send(sock_username.encode("utf-8")
+				print("DEBUG:")
+				for i in channels['channels']:
+					sock_channel = "JOIN {}\n".format(i)]
+					sock.send(sock_channel.encode("utf-8")
+					print(i)
+			
+					print("DEBUG: Connection: {}, {}, {}".format(sock_token, sock_username, sock_channel))
+			except:
+				pritn("DEBUG: #Authentification failed")
 		except:
 			print(bcolors.BLUE + "DEBUG: Connection failed")
 			
