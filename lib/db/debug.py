@@ -40,13 +40,13 @@ class irc:
 		self.token = token
 		self.user = user
 		
-	def connection(self, server, port):
+	def connection(self, server, port, token, user):
 		from modules.colors import bcolors
 		
 		try:
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
-			print("DEBUG: Connection success: {}, {}".format(server, port))
+			print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
 
 			cFile = open('config/channels.json')
 			channels = json.load(cFile)
@@ -55,19 +55,19 @@ class irc:
 			
 			#Authentification
 			try:
-				sock.send(sock_token.encode("utf-8"))
-				sock.send(sock_username.encode("utf-8"))
-				print("DEBUG:")
+				ircsocket.send(sock_token.encode("utf-8"))
+				ircsocket.send(sock_username.encode("utf-8"))
+				print(bcolors.RED + "DEBUG: channels loop")
 				for i in channels['channels']:
 					sock_channel = "JOIN {}\n".format(i)
-					sock.send(sock_channel.encode("utf-8"))
+					ircsocket.send(sock_channel.encode("utf-8"))
 					print(i)
 			
-					print("DEBUG: Connection: {}, {}, {}".format(sock_token, sock_username, sock_channel))
+					print(bcolors.RED + "DEBUG: Connection: {}, {}, {}".format(sock_token, sock_username, sock_channel))
 			except:
-				print("DEBUG: #Authentification failed")
+				print(bcolors.RED + "DEBUG: #Authentification failed")
 		except:
-			print(bcolors.BLUE + "DEBUG: Connection failed")
+			print(bcolors.RED + "DEBUG: Connection failed")
 			
 #ask [server, port, token, user]
 def input_data():
@@ -121,5 +121,5 @@ if __name__ == "__main__":
 	print("DEBUG: bot = irc(data[0], data[1], data[2], data[3])") 
 	bot = irc(data[0], data[1], data [2], data[3])
 	print("DEBUG: bot.connection(data[0], data[1])")
-	bot.connection(data[0], data[1])
+	bot.connection(data[0], data[1], data [2], data[3])
     
