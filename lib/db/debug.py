@@ -51,7 +51,7 @@ class irc:
 		except:
 			print(bcolors.BLUE + "DEBUG: Connection failed")
 			
-#ask [server, por, token, user]
+#ask [server, port, token, user]
 def input_data():
 	global data
 	data = []
@@ -85,13 +85,19 @@ def input_data():
 	print(" ")
 	
 if __name__ == "__main__":
+	
+	#data[0] = server
+	#data[1] = port
+	#data[2] = auth token
+	#data[3] = user
+	
 	print("DEBUG: check_color()")
 	check_color()
 	print("DEBUG: banner()")
 	banner()
 	print("DEBUG: input_data()")
 	input_data()
-	print("DEBUG: bot = irc(data[0], data[1], data[2], data[3])")
+	print("DEBUG: bot = irc(data[0], data[1], data[2], data[3])") 
 	bot = irc(data[0], data[1], data [2], data[3])
 	print("DEBUG: bot.connection(data[0], data[1])")
 	bot.connection(data[0], data[1])
