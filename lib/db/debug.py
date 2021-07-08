@@ -66,18 +66,19 @@ class irc:
 					ircsocket.send(sock_channel.encode("utf-8"))
 					print(bcolors.PURPLE + "Joined Channel: {}".format(i))
 					print("Connected: TOKEN: {} USER: {} CHANNEL: {}".format(sock_token, sock_username, sock_channel))
-					ircmsg = ircsocket.recv(2048).decode("UTF-8")
-					ircmsg = ircmsg.strip('nr')
-					print(ircmsg)
 			except:
 				print(bcolors.RED + "DEBUG: #Authentification failed")
 		except:
 			print(bcolors.RED + "DEBUG: Connection failed")
 			
 	def connection_receive(self):
-		ircmsg = ircsocket.recv(2048).decode("UTF-8")
-		ircmsg = ircmsg.strip('nr')
-		print(ircmsg)
+		while True:
+			ircmsg = ircsocket.recv(2048).decode("UTF-8")
+			ircmsg = ircmsg.strip('nr')
+			if ircmsg.find("test") != -1:
+				ame = ircmsg.split('!',1)[0][1:]
+				message = ircmsg.split('test',1)[1].split(':',1)[1]
+				print(message)
 			
 #ask [server, port, token, user]
 def input_data():
