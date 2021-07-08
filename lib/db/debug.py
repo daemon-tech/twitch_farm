@@ -58,13 +58,23 @@ def input_data():
 	for i in range(1, 4+1):
 		if i == 1:
 			server_input = input("Server Input: ")
-			data_input = gethostbyname(server_input)
-			#data_input = int(data_input)
-			data.append(data_input)
+			if server_input == "":
+				data.append("irc.chat.twitch.tv")
+			elif server_input != "irc.chat.twitch.tv":
+				data_input = gethostbyname(server_input)
+				#data_input = int(data_input)
+				data.append(data_input)
+			else:
+				data.append("irc.chat.twitch.tv")
 		elif i == 2:
 			port_input = input("Port Input: ")
-			data_input = int(port_input)
-			data.append(data_input)
+			if port_input == "":
+				data.append(int(6667))
+			elif port_input != 6667:
+				data_input = int(port_input)
+				data.append(data_input)
+			else:
+				data.append(int(6667))
 		elif i == 3:
 			data_input = input("OAUTH Token Input: ")
 			data.append(data_input)
@@ -81,7 +91,7 @@ if __name__ == "__main__":
 	banner()
 	print("DEBUG: input_data()")
 	input_data()
-	print("DEBUG: bot = irc(data[0], data[1], data [2], data[3])")
+	print("DEBUG: bot = irc(data[0], data[1], data[2], data[3])")
 	bot = irc(data[0], data[1], data [2], data[3])
 	print("DEBUG: bot.connection(data[0], data[1])")
 	bot.connection(data[0], data[1])
