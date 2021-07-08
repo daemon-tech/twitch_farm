@@ -77,7 +77,7 @@ class irc:
 	
 	def send(self, command, message):
 		c = "{} {}\r\n".format(command, message).encode("utf-8")
-		self.ircsocket.send(c)
+		ircsocket.send(c)
 			
 #ask [server, port, token, user]
 def input_data():
