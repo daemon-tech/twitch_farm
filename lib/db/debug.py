@@ -64,7 +64,7 @@ class irc:
 					sock_channel = "JOIN {}\n".format(i)
 					ircsocket.send(sock_channel.encode("utf-8"))
 					print(bcolors.PURPLE + "Joined Channel: {}".format(i))
-					print("Connected: TOKEN: {} USER: {} CHANNEL: {}".format(sock_tocken, sock_username, sock_channel)
+					print("Connected: TOKEN: {} USER: {} CHANNEL: {}".format(sock_tocken, sock_username, sock_channel))
 			except:
 				print(bcolors.RED + "DEBUG: #Authentification failed")
 		except:
