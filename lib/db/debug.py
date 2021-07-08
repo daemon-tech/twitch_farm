@@ -33,13 +33,13 @@ def banner():
 
 class irc:
 	
-	def __init__(self, server, port, token, user):
+	def __init__(self, username, token, server, port):
 		self.server = server
 		self.port = port
 		self.token = token
-		self.user = user
+		self.user = username
 		
-	def connection(self, server, port, token, user):
+	def connection(self, username, token, server, port):
 		from modules.colors import bcolors
 		
 		try:
@@ -49,8 +49,8 @@ class irc:
 			print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
 			cFile = open('lib/db/config/config.json')
 			channels = json.load(cFile)
-			sock_token = "PASS {}\n".format(data[2])
-			sock_username = "NICK {}\n".format(data[3])
+			sock_token = "PASS {}\n".format(data[1])
+			sock_username = "NICK {}\n".format(data[0])
 			
 			#Authentification
 			try:
@@ -80,17 +80,17 @@ def input_data():
 
 	global data
 	data = []
-	data.append("irc.chat.twitch.tv")
-	data.append(int(6667))
 	data.append(credentials['credentials']['username'])
 	data.append(credentials['credentials']['token'])
+	data.append("irc.chat.twitch.tv")
+	data.append(int(6667))
 	
 if __name__ == "__main__":
 	from modules.colors import bcolors
-	#data[0] = server
-	#data[1] = port
-	#data[2] = auth token
-	#data[3] = user
+	#data[0] = user
+	#data[1] = token
+	#data[2] = server
+	#data[3] = port
 	
 	#build connection
 	#join channel -> read from channel list
@@ -101,17 +101,18 @@ if __name__ == "__main__":
 	banner()
 	print(bcolors.RED + "DEBUG: input_data()")
 	input_data()
-	print("DEBUG: bot = irc(data[0], data[1], data[2], data[3])") 
+	print("DEBUG: get = irc(data[0], data[1], data[2], data[3])") 
 	get = irc(data[0], data[1], data [2], data[3])
-	print("DEBUG: bot.connection(data[0], data[1])")
+	print("DEBUG: ", get.connection(data[0], data[1], data [2], data[3]))
 	get.connection(data[0], data[1], data [2], data[3])
 	bot = irc(data[0], data[1], data [2], data[3])
 	
 	while True:
-		time.sleep(2)
+		time.sleep(1)
 		print(bcolors.RED + "DEBUG: buffer = bot.receive()")
 		buffer = bot.receive()
 		print("DEBUG: resp, buffer = buffer.split('\n', 1)")
+		print(buffer)
 		resp, buffer = buffer.split('\n', 1)
 		print("DEBUG: if resp.startswith('PING'):")
 		if resp.startswith('PING'):
@@ -119,6 +120,7 @@ if __name__ == "__main__":
 				print("Pong send")
 		print("DEBUG: resplit = resp.strip().split()")
 		resplit = resp.strip().split()
+		print(f"DEBUG: resplit = resp.strip().split() {resplit}")
 		if resplit[1] == "PRIVMSG":
 			try:
 				msg = resp.strip().split(":", 2) # split(":", 2)
@@ -131,4 +133,3 @@ if __name__ == "__main__":
 				continue
 			if msg_split[0] == "test":
 				print(msg_split[0])
-					
