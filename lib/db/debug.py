@@ -139,3 +139,4 @@ if __name__ == "__main__":
 		resp, buffer = buffer.split('\n', 1)
 		if resp.startswith('PING'):
 				bot.send("PONG", "")
+				print("Pong send")
