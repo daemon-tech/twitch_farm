@@ -73,12 +73,16 @@ def input_data():
 			data.append(data_input)
 	print(data)
 	print(" ")
-
 	
 if __name__ == "__main__":
-    check_color()
-    banner()
-    input_data()
-    bot = irc(data[0], data[1], data [2], data[3])
-    bot.connection(data[0], data[1])
+	print("DEBUG: check_color()")
+	check_color()
+	print("DEBUG: banner()")
+	banner()
+	print("DEBUG: input_data()")
+	input_data()
+	print("DEBUG: bot = irc(data[0], data[1], data [2], data[3])")
+	bot = irc(data[0], data[1], data [2], data[3])
+	print("DEBUG: bot.connection(data[0], data[1])")
+	bot.connection(data[0], data[1])
     
