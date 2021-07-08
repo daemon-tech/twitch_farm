@@ -46,7 +46,7 @@ class irc:
 		try:
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
-			print("DEBUG: Connection success: {}, {}".format(server, port)
+			print("DEBUG: Connection success: {}, {}".format(server, port))
 		except:
 			print(bcolors.BLUE + "DEBUG: Connection failed")
 			
@@ -89,6 +89,9 @@ if __name__ == "__main__":
 	#data[1] = port
 	#data[2] = auth token
 	#data[3] = user
+	
+	#build connection
+	#join channel -> read from channel list
 	
 	print("DEBUG: check_color()")
 	check_color()
