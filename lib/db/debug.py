@@ -45,7 +45,7 @@ class irc:
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
 		except:
-			print(bcolors.BLUE + "DEBUG: Connection failed")
+			print(BLUE + "DEBUG: Connection failed")
 			
 #ask [server, por, token, user]
 def input_data():
