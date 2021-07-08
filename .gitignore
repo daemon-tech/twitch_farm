@@ -1,0 +1,5 @@
+#Jetbrains Projectfolder
+\.idea\
+
+#.save files
+*.save*
