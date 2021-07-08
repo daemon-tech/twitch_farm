@@ -30,13 +30,18 @@ def banner():
 	title = Figlet(font="banner3-D")
 	print(bcolors.PURPLE + title.renderText("TFARMER"))
 
-class bot:
+class irc:
 	def __init__(self, server, port, token, user):
 		self.server = server
 		self.port = port
 		self.token = token
 		self.user = username
-
+		
+	def connection(server, port):
+		self.ircsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.ircsocket.connect((self.server, self.port))
+		
+#ask [server, por, token, user]
 def input_data():
 	data = []
 	for i in range(1, 4+1):
@@ -53,9 +58,11 @@ def input_data():
 			data_input = input("Username Input")
 			data.append(data_input)
 	print(data)
+
 	
 if __name__ == "__main__":
     check_color()
     banner()
     input_data()
+    bot = irc(data[0], data[1], data [2], data[3])
     
