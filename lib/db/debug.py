@@ -47,9 +47,12 @@ class irc:
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
 			print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
-
-			cFile = open('config/channels.json')
+			try:
+				cFile = open('config/channels.json')
+			except:
+				cFile = open('lib/db/config/channels.json')
 			channels = json.load(cFile)
+			print("DEBUG: loaded: channels = json.load(cFile)")
 			sock_token = "PASS {}\n".format(data[2])
 			sock_username = "NICK {}\n".format(data[3])
 			
@@ -57,13 +60,10 @@ class irc:
 			try:
 				ircsocket.send(sock_token.encode("utf-8"))
 				ircsocket.send(sock_username.encode("utf-8"))
-				print(bcolors.RED + "DEBUG: channels loop")
 				for i in channels['channels']:
 					sock_channel = "JOIN {}\n".format(i)
 					ircsocket.send(sock_channel.encode("utf-8"))
-					print(i)
-			
-					print(bcolors.RED + "DEBUG: Connection: {}, {}, {}".format(sock_token, sock_username, sock_channel))
+					print(bcolors.PURPLE + "Joined Channel: {}".format(i))
 			except:
 				print(bcolors.RED + "DEBUG: #Authentification failed")
 		except:
@@ -103,7 +103,7 @@ def input_data():
 	print(" ")
 	
 if __name__ == "__main__":
-	
+	from modules.colors import bcolors
 	#data[0] = server
 	#data[1] = port
 	#data[2] = auth token
@@ -116,7 +116,7 @@ if __name__ == "__main__":
 	check_color()
 	print("DEBUG: banner()")
 	banner()
-	print("DEBUG: input_data()")
+	print(bcolors.RED + "DEBUG: input_data()")
 	input_data()
 	print("DEBUG: bot = irc(data[0], data[1], data[2], data[3])") 
 	bot = irc(data[0], data[1], data [2], data[3])
