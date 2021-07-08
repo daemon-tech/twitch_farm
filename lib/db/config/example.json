@@ -1,0 +1,11 @@
+{
+  "credentials": {
+    "username": "twitch_username",
+    "token": "oauth:xyz"
+  },
+  "channels": [
+    "purefallen",
+    "intelligencedi1",
+	"daem0nnnn"
+  ]
+}

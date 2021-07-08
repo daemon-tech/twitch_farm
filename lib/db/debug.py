@@ -49,10 +49,7 @@ class irc:
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
 			print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
-			try:
-				cFile = open('config/channels.json')
-			except:
-				cFile = open('lib/db/config/channels.json')
+			cFile = open('lib/db/config/config.json')
 			channels = json.load(cFile)
 			print("DEBUG: loaded: channels = json.load(cFile)")
 			sock_token = "PASS {}\n".format(data[2])
@@ -81,36 +78,15 @@ class irc:
 			
 #ask [server, port, token, user]
 def input_data():
+	cfile = open('lib/db/config/config.json')
+	credentials = json.load(cfile)
+
 	global data
 	data = []
-	for i in range(1, 4+1):
-		if i == 1:
-			server_input = input("Server Input: ")
-			if server_input == "":
-				data.append("irc.chat.twitch.tv")
-			elif server_input != "irc.chat.twitch.tv":
-				data_input = gethostbyname(server_input)
-				#data_input = int(data_input)
-				data.append(data_input)
-			else:
-				data.append("irc.chat.twitch.tv")
-		elif i == 2:
-			port_input = input("Port Input: ")
-			if port_input == "":
-				data.append(int(6667))
-			elif port_input != 6667:
-				data_input = int(port_input)
-				data.append(data_input)
-			else:
-				data.append(int(6667))
-		elif i == 3:
-			data_input = input("OAUTH Token Input: ")
-			data.append(data_input)
-		elif i == 4:
-			data_input = input("Username Input: ")
-			data.append(data_input)
-	print(data)
-	print(" ")
+	data.append("irc.chat.twitch.tv")
+	data.append(int(6667))
+	data.append(credentials['credentials']['username'])
+	data.append(credentials['credentials']['token'])
 	
 if __name__ == "__main__":
 	from modules.colors import bcolors

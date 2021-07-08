@@ -6,3 +6,6 @@
 
 # Python Cache | Byte-compiled / optimized / DLL files
 __pycache__/
+
+# Actual Configuration
+config.json
