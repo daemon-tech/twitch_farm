@@ -55,7 +55,7 @@ def input_data():
 		if i == 1:
 			server_input = input("Server Input: ")
 			data_input = gethostbyname(server_input)
-			data_input = int(data_input)
+			#data_input = int(data_input)
 			data.append(data_input)
 		elif i == 2:
 			data_input = input("Port Input: ")
