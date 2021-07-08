@@ -55,17 +55,17 @@ class irc:
 			
 			#Authentification
 			try:
-				sock.send(sock_token.encode("utf-8")
-				sock.send(sock_username.encode("utf-8")
+				sock.send(sock_token.encode("utf-8"))
+				sock.send(sock_username.encode("utf-8"))
 				print("DEBUG:")
 				for i in channels['channels']:
-					sock_channel = "JOIN {}\n".format(i)]
-					sock.send(sock_channel.encode("utf-8")
+					sock_channel = "JOIN {}\n".format(i)
+					sock.send(sock_channel.encode("utf-8"))
 					print(i)
 			
 					print("DEBUG: Connection: {}, {}, {}".format(sock_token, sock_username, sock_channel))
 			except:
-				pritn("DEBUG: #Authentification failed")
+				print("DEBUG: #Authentification failed")
 		except:
 			print(bcolors.BLUE + "DEBUG: Connection failed")
 			
