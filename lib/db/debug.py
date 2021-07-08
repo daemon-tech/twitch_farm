@@ -46,7 +46,14 @@ class irc:
 		try:
 			ircsocket = socket(AF_INET, SOCK_STREAM)
 			ircsocket.connect((server, port))
+			
 			print("DEBUG: Connection success: {}, {}".format(server, port))
+			print("DEBUG: Connection success")
+
+			cFile = open('config/channels.json')
+			channels = json.load(cFile)
+			for i in channels['channels']:
+				print(i)
 		except:
 			print(bcolors.BLUE + "DEBUG: Connection failed")
 			
