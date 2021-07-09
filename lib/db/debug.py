@@ -106,23 +106,24 @@ if __name__ == "__main__":
 		buffer = bot.receive()
 		if buffer is not None:
 			
-			show_chat = True
+			show_chat = False
 			
+			#Filter Chat into string and append space character
 			if show_chat is True:
-				buffer_splited = buffer.split()
-				#" ".join(str(item) for item in buffer)
+				try:
+					buffer_splited = buffer.split()
+					def buffer_to_irc_chat(buffer_splited):
+						irc_string = ""
+						for i in range(0, 2):
+							buffer_splited.pop(i)
+						for element in buffer_splited:
+							irc_string += element + " "
+						return irc_string
+					print(bcolors.LIGHT_WHITE + buffer_to_irc_chat(buffer_splited))
+				except:
+					pritn(bcolors.RED + "Exception in buffer_to_irc_chat(buffer_splited):")
+					pass
 			
-				#Filter Chat into string and append space character
-				def buffer_to_irc_chat(buffer_splited):
-					irc_string = ""
-					for i in range(0, 2):
-						buffer_splited.pop(i)
-					for element in buffer_splited:
-						irc_string += element + " "
-					return irc_string
-				print(buffer_to_irc_chat(buffer_splited))
-			
-			#print(bcolors.PURPLE + "IRC-CHAT: {}".format(buffer))
 			resp, buffer = buffer.split('\n', 1)
 			if resp.startswith('PING'):
 				bot.send("PONG", "")
@@ -130,7 +131,6 @@ if __name__ == "__main__":
 			resplit = resp.strip().split()
 
 			if resplit[1] == "PRIVMSG":
-				
 				try:
 					msg = resp.strip().split(":", 2) # split(":", 2)
 					msg_split = msg[2].split(" ")
