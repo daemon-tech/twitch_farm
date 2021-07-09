@@ -46,7 +46,7 @@ class irc:
 			global ircsocket
 			ircsocket = socket.socket()
 			ircsocket.connect((server, port))
-			print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
+			#print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
 			cFile = open('lib/db/config/config.json')
 			channels = json.load(cFile)
 			sock_token = "PASS {}\n".format(data[1])
@@ -59,8 +59,6 @@ class irc:
 				for i in channels['channels']:
 					sock_channel = "JOIN {}\n".format(i)
 					ircsocket.send(sock_channel.encode("utf-8"))
-					print(bcolors.PURPLE + "Joined Channel: {}".format(i))
-					print("Connected: TOKEN: {} USER: {} CHANNEL: {}".format(sock_token, sock_username, sock_channel))
 			except:
 				print(bcolors.RED + "DEBUG: #Authentification failed")
 		except:
@@ -92,46 +90,43 @@ if __name__ == "__main__":
 	#data[2] = server
 	#data[3] = port
 	
-	#build connection
-	#join channel -> read from channel list
-	
-	print("DEBUG: check_color()")
 	check_color()
-	print("DEBUG: banner()")
 	banner()
-	print(bcolors.RED + "DEBUG: input_data()")
 	input_data()
-	print("DEBUG: get = irc(data[0], data[1], data[2], data[3])") 
 	get = irc(data[0], data[1], data [2], data[3])
-	print("DEBUG: ", get.connection(data[0], data[1], data [2], data[3]))
 	get.connection(data[0], data[1], data [2], data[3])
 	bot = irc(data[0], data[1], data [2], data[3])
 	
+	print(" ")
+	print(" ")
+	print(bcolors.LIGHT_PURPLE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
+	print(bcolors.Purple + " ")
+	
 	while True:
-		print(bcolors.RED + "DEBUG: buffer = bot.receive()")
 		buffer = bot.receive()
 		if buffer is not None:
-			print("DEBUG: resp, buffer = buffer.split('\n', 1)")
-			print(buffer)
+			#print(bcolors.PURPLE + "IRC-CHAT: {}".format(buffer))
 			resp, buffer = buffer.split('\n', 1)
-			print("DEBUG: if resp.startswith('PING'):")
-		
 			if resp.startswith('PING'):
 				bot.send("PONG", "")
-				print("Pong send")
-			print("DEBUG: resplit = resp.strip().split()")
+				print(bcolors.PURPLE + "Pong send")
 			resplit = resp.strip().split()
-			print(f"DEBUG: resplit = resp.strip().split() {resplit}")
-		
+			
 			if resplit[1] == "PRIVMSG":
+				
 				try:
 					msg = resp.strip().split(":", 2) # split(":", 2)
 					msg_split = msg[2].split(" ")
 					chan = msg[1].split("PRIVMSG")[1].strip()
 					user = msg[1].split("!")[0]
-					print("DEBUG: try")
 				except:
 					log(err_log, "******\n{} ER MSG:\n{}\n\nOF MSG:\n{}\n".format(msg, resp))
 					continue
-				if msg_split[0] == "test":
+					
+				if msg_split[0] == "debuglog":
 					print(msg_split[0])
+					
+					
+					
+					
+					
