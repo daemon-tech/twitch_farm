@@ -7,6 +7,7 @@ import pyfiglet
 import sys
 import threading
 
+from time import sleep
 from pyfiglet import Figlet
 from socket import gethostbyname
 
@@ -70,8 +71,14 @@ class irc:
 	def send(self, command, message):
 		c = "{} {}\r\n".format(command, message).encode("utf-8")
 		ircsocket.send(c)
+	def answer_irc(self, channel, message):
+		c = "PRIVMSG {} :{}\r\n".format(channel, message).encode("utf-8")
 			
+	def answer(self, channel_privmsg, message):
+		irc_message = "PRIVMSG {} :{}\r\n".format(channel_privmsg, message).encode("utf-8")
+		self.ircsocket.send(irc_message)
 #ask [server, port, token, user]
+
 def input_data():
 	cfile = open('lib/db/config/config.json')
 	credentials = json.load(cfile)
@@ -134,7 +141,7 @@ if __name__ == "__main__":
 				try:
 					msg = resp.strip().split(":", 2) # split(":", 2)
 					msg_split = msg[2].split(" ")
-					chan = msg[1].split("PRIVMSG")[1].strip()
+					channel_privmsg = msg[1].split("PRIVMSG")[1].strip()
 					user = msg[1].split("!")[0]
 				except:
 					log(f"******\nMSG:\n{msg}\n\nOF MSG:\n{resp}\n")
@@ -142,8 +149,8 @@ if __name__ == "__main__":
 				
 				if msg_split[0] == "funnymomentspog":
 					print(msg_split[0])
-					
-					
-					
-					
-					
+
+				elif msg_split[0] == "!raffle":
+					print(bcolors.GREEN + "!raffle init.") 
+					sleep(10) 
+					bot.answer(channel, '!joins')
