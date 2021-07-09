@@ -36,25 +36,37 @@ def start_main():
     # Needs to be imported in start_rain() to ensure previous ModuleNotFoundError-check
     import json
 
-    config_file = open('lib/db/config/config.json')
-    config = json.load(config_file)
-
     try:
+        config_file = open('lib/db/config/config.json')
+        config = json.load(config_file)
 
         if config['quickstart']:
             os.system("python3 lib/db/loader.py")
         elif not config['quickstart']:
             start_menue()
 
+    except FileNotFoundError:
+        print('"config.json" not found. Please configure "example.json" and rename it to "config.json".')
+        exit()
+    except json.decoder.JSONDecodeError as err:
+        print("Unable to read JSON File:\n" + format(err))
+        exit()
     except KeyError:
         start_menue()
 
 
 def start_menue():
     print("Modules correctly installed. Starting session?")
-    start = input("[y/n]")
-    if start == "y" or start == "Y":
-        os.system("python3 lib/db/loader.py")
+    try:
+
+        start = input("[y/n]")
+        if start == "y" or start == "Y":
+            os.system("python3 lib/db/loader.py")
+
+    except KeyboardInterrupt:
+        print("\nProgram closed by user (CTRL+C)")
+        exit()
+
 
 
 if __name__ == "__main__":
