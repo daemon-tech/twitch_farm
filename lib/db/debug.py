@@ -106,19 +106,21 @@ if __name__ == "__main__":
 		buffer = bot.receive()
 		if buffer is not None:
 			
-			buffer_splited = buffer.split()
-			#" ".join(str(item) for item in buffer)
+			show_chat = True
 			
-			#Filter Chat into string and append space character
-			def buffer_to_irc_chat(buffer_splited):
-				irc_string = ""
-				for i in range(0, 2):
-					buffer_splited.pop(i)
-				for element in buffer_splited:
-					irc_string += element + " "
-				return irc_string
+			if show_chat is True:
+				buffer_splited = buffer.split()
+				#" ".join(str(item) for item in buffer)
 			
-			print(buffer_to_irc_chat(buffer_splited))
+				#Filter Chat into string and append space character
+				def buffer_to_irc_chat(buffer_splited):
+					irc_string = ""
+					for i in range(0, 2):
+						buffer_splited.pop(i)
+					for element in buffer_splited:
+						irc_string += element + " "
+					return irc_string
+				print(buffer_to_irc_chat(buffer_splited))
 			
 			#print(bcolors.PURPLE + "IRC-CHAT: {}".format(buffer))
 			resp, buffer = buffer.split('\n', 1)
@@ -135,7 +137,7 @@ if __name__ == "__main__":
 					chan = msg[1].split("PRIVMSG")[1].strip()
 					user = msg[1].split("!")[0]
 				except:
-					log(err_log, "******\n{} ER MSG:\n{}\n\nOF MSG:\n{}\n".format(msg, resp))
+					log(f"******\nMSG:\n{msg}\n\nOF MSG:\n{resp}\n")
 					continue
 				
 				if msg_split[0] == "funnymomentspog":
