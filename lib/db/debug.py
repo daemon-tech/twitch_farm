@@ -6,6 +6,7 @@ import socket
 import pyfiglet
 import sys
 import threading
+import requests
 
 from time import sleep
 from pyfiglet import Figlet
@@ -79,6 +80,15 @@ class irc:
 		ircsocket.send(irc_message)
 #ask [server, port, token, user]
 
+def isLiveBroadcast(channel_privmsg):
+	contents = request.get('https://www.twitch.tv/' + channel_privmsg).content.decode('utf-8')
+	if 'isLiveBroadcast' in contents:
+		print(f"Channel: {channel_privmsg} is live")
+		return True
+	else:
+		print(f"Channel: {channel_privmsg} is offline")
+		return False
+
 def input_data():
 	cfile = open('lib/db/config/config.json')
 	credentials = json.load(cfile)
@@ -151,6 +161,10 @@ if __name__ == "__main__":
 					print(bcolors.GREEN + "Channel: {} => {}".format(channel_privmsg, msg_split[0]))
 
 				elif msg_split[0] == "!raffle":
-					print(bcolors.GREEN + "Channel: {}  => !raffle init.".format(channel_privmsg)) 
-					sleep(10) 
-					bot.answer(channel_privmsg, '!joins')
+					try:
+						if isLiveBroadcast(channel_privmsg) is True:
+							print(bcolors.GREEN + "Channel: {}  => !raffle init.".format(channel_privmsg)) 
+							sleep(10) 
+							bot.answer(channel_privmsg, '!joins')
+					except:
+						print(bcolors.RED + "Exception in isLiveBroadcast!")
