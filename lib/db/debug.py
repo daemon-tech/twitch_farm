@@ -99,19 +99,34 @@ if __name__ == "__main__":
 	
 	print(" ")
 	print(" ")
-	print(bcolors.LIGHT_PURPLE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
-	print(bcolors.Purple + " ")
+	print(bcolors.LIGHT_WHITE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
+	print(bcolors.PURPLE + " ")
 	
 	while True:
 		buffer = bot.receive()
 		if buffer is not None:
+			
+			buffer_splited = buffer.split()
+			#" ".join(str(item) for item in buffer)
+			
+			#Filter Chat into string and append space character
+			def buffer_to_irc_chat(buffer_splited):
+				irc_string = ""
+				for i in range(0, 2):
+					buffer_splited.pop(i)
+				for element in buffer_splited:
+					irc_string += element + " "
+				return irc_string
+			
+			print(buffer_to_irc_chat(buffer_splited))
+			
 			#print(bcolors.PURPLE + "IRC-CHAT: {}".format(buffer))
 			resp, buffer = buffer.split('\n', 1)
 			if resp.startswith('PING'):
 				bot.send("PONG", "")
 				print(bcolors.PURPLE + "Pong send")
 			resplit = resp.strip().split()
-			
+
 			if resplit[1] == "PRIVMSG":
 				
 				try:
@@ -122,8 +137,8 @@ if __name__ == "__main__":
 				except:
 					log(err_log, "******\n{} ER MSG:\n{}\n\nOF MSG:\n{}\n".format(msg, resp))
 					continue
-					
-				if msg_split[0] == "debuglog":
+				
+				if msg_split[0] == "funnymomentspog":
 					print(msg_split[0])
 					
 					
