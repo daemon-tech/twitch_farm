@@ -76,7 +76,7 @@ class irc:
 			
 	def answer(self, channel_privmsg, message):
 		irc_message = "PRIVMSG {} :{}\r\n".format(channel_privmsg, message).encode("utf-8")
-		self.ircsocket.send(irc_message)
+		ircsocket.send(irc_message)
 #ask [server, port, token, user]
 
 def input_data():
@@ -153,4 +153,4 @@ if __name__ == "__main__":
 				elif msg_split[0] == "!raffle":
 					print(bcolors.GREEN + "!raffle init.") 
 					sleep(10) 
-					bot.answer(channel, '!joins')
+					bot.answer(channel_privmsg, '!joins')
