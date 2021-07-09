@@ -81,12 +81,13 @@ class irc:
 #ask [server, port, token, user]
 
 def isLiveBroadcast(channel_privmsg):
-	contents = request.get('https://www.twitch.tv/' + channel_privmsg).content.decode('utf-8')
+	channel_name =  channel_privmsg[1:]
+	contents = requests.get('https://www.twitch.tv/' + channel_name).content.decode('utf-8')
 	if 'isLiveBroadcast' in contents:
-		print(f"Channel: {channel_privmsg} is live")
+		print(f"Channel: {channel_name} is live")
 		return True
 	else:
-		print(f"Channel: {channel_privmsg} is offline")
+		print(f"Channel: {channel_name} is offline")
 		return False
 
 def input_data():
@@ -161,10 +162,9 @@ if __name__ == "__main__":
 					print(bcolors.GREEN + "Channel: {} => {}".format(channel_privmsg, msg_split[0]))
 
 				elif msg_split[0] == "!raffle":
-					try:
-						if isLiveBroadcast(channel_privmsg) is True:
-							print(bcolors.GREEN + "Channel: {}  => !raffle init.".format(channel_privmsg)) 
-							sleep(10) 
-							bot.answer(channel_privmsg, '!joins')
-					except:
-						print(bcolors.RED + "Exception in isLiveBroadcast!")
+					print(bcolors.GREEN + "Channel: {} => !raffle".format(channel_privmsg))
+					if isLiveBroadcast(channel_privmsg) is True:
+						sleep(10) 
+						bot.answer(channel_privmsg, '!joins')
+					elif isLiveBroadcast(channel_privmsg) is False:
+						print(bcolors.GREEN + "BOT: {} tried to fool us :P".format(channel_privmsg))
