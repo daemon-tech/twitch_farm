@@ -148,9 +148,9 @@ if __name__ == "__main__":
 					continue
 				
 				if msg_split[0] == "funnymomentspog":
-					print(msg_split[0])
+					print(bcolors.GREEN + "Channel: {} => {}".format(channel_privmsg, msg_split[0]))
 
 				elif msg_split[0] == "!raffle":
-					print(bcolors.GREEN + "!raffle init.") 
+					print(bcolors.GREEN + "Channel: {}  => !raffle init.".format(channel_privmsg)) 
 					sleep(10) 
 					bot.answer(channel_privmsg, '!joins')
