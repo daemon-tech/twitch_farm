@@ -9,9 +9,11 @@ from pyfiglet import Figlet
 
 subprocess.call('clear', shell=True)
 
+
 def init_update():
 	if os.path.basename(__file__) == 'main.py':
 		pass # TODO: Auto-Update using Git
+
 
 def check_color():
 	try:
@@ -20,10 +22,28 @@ def check_color():
 		print("modules/colors.py seems missing. Did you install this program correctly?")
 		exit()
 
+
 def banner():
 	from modules.colors import bcolors
 	title = Figlet(font="banner3-D")
 	print(bcolors.PURPLE + title.renderText("TFARMER"))
+
+
+def get_config():
+	# Error Handling already happened in launcher
+	config_file = open('lib/db/config/config.json')
+
+	return json.load(config_file)
+
+
+def get_data(cfg):
+	username = cfg['credentials']['username']
+	token = cfg['credentials']['token']
+	server = 'irc.chat.twitch.tv'
+	port = 6667
+
+	return [username, token, server, port]
+
 
 class IRC:
 	
@@ -91,28 +111,16 @@ def is_owner(channel_privmsg, user):
 		print(bcolors.GREEN + "User: {} is not owner. \n {} tried to fool us !!!!".format(user))
 		return False
 
-def input_data():
-	cfile = open('lib/db/config/config.json')
-	credentials = json.load(cfile)
 
-	global data
-	data = []
-	data.append(credentials['credentials']['username'])
-	data.append(credentials['credentials']['token'])
-	data.append("irc.chat.twitch.tv")
-	data.append(int(6667))
-	
 if __name__ == "__main__":
 	from modules.colors import bcolors
-	#data[0] = user
-	#data[1] = token
-	#data[2] = server
-	#data[3] = port
-
 	init_update()
 	check_color()
 	banner()
-	input_data()
+
+	config = get_config()
+	data = get_data(config)
+
 	get = IRC(data[0], data[1], data [2], data[3])
 	get.connection(data[0], data[1], data [2], data[3])
 	bot = IRC(data[0], data[1], data [2], data[3])
