@@ -133,6 +133,7 @@ def loop():
 					# Remove /me or the Column at the first word
 					if buffer_split[3] == ':\x01ACTION':
 						message = buffer_split[4:]
+						message[len(message)-1] = message[len(message)-1][:-1]
 					else:
 						message = buffer_split[3:]
 						message[0] = message[0][1:]
