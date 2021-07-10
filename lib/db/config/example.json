@@ -4,9 +4,9 @@
     "token": "oauth:xyz"
   },
   "channels": [
-    "purefallen",
-    "intelligencedi1",
-    "daem0nnnn"
+    "#purefallen",
+    "#intelligencedi1",
+    "#daem0nnnn"
   ],
   "debug": false,
   "quickstart": false
