@@ -24,7 +24,7 @@ def print_spacer():
 	print(" ")
 	print(" ")
 	print(bcolors.LIGHT_WHITE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
-	print(bcolors.PURPLE + " ")
+	print(" ")
 
 def print_info(info_string):
 	print(bcolors.PURPLE + info_string)
@@ -107,6 +107,7 @@ def answer(irc_socket, channel_privmsg, message):
 
 def loop():
 	while True:
+		buffer = ''
 		try:
 			buffer = receive(socket)
 		except ConnectionResetError:
