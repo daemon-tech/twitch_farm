@@ -30,7 +30,7 @@ def banner():
 	title = Figlet(font="banner3-D")
 	print(bcolors.PURPLE + title.renderText("TFARMER"))
 
-class irc:
+class IRC:
 	
 	def __init__(self, username, token, server, port):
 		self.server = server
@@ -118,9 +118,9 @@ if __name__ == "__main__":
 	check_color()
 	banner()
 	input_data()
-	get = irc(data[0], data[1], data [2], data[3])
+	get = IRC(data[0], data[1], data [2], data[3])
 	get.connection(data[0], data[1], data [2], data[3])
-	bot = irc(data[0], data[1], data [2], data[3])
+	bot = IRC(data[0], data[1], data [2], data[3])
 	
 	print(" ")
 	print(" ")
