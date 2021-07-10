@@ -32,6 +32,9 @@ def print_info(info_string):
 def print_error(err_string):
 	print("{}ERROR: {}".format(bcolors.RED, err_string))
 
+def print_debug(debug_string):
+	print("{}DEBUG:\n{}".format(bcolors.CYAN, debug_string))
+
 
 # =====================================================================================================================
 # DATA
@@ -120,7 +123,8 @@ def loop():
 
 		if buffer is not None:
 			buffer_split = buffer.split()
-			print_buffer_split(buffer_split)
+
+			print_debug(buffer_split)
 
 			if buffer_split[1] == 'PING':
 				send(socket, "PONG", "")
@@ -130,35 +134,15 @@ def loop():
 				username = buffer_split[0][1:].split('!')[0]
 
 				if buffer_split[1] == 'PRIVMSG':
-					# Remove /me or the Column at the first word
-					if buffer_split[3] == ':\x01ACTION':
-						message = buffer_split[4:]
-						message[len(message)-1] = message[len(message)-1][:-1]
-					else:
-						message = buffer_split[3:]
-						message[0] = message[0][1:]
-
+					message = get_message(buffer_split)
 
 					if show_chat is True:
 						print_chat(channel, username, message)
 
-			'''
-			if resplit[1] == "PRIVMSG":
-				try:
-					msg = resp.strip().split(":", 2)  # split(":", 2)
-					msg_split = msg[2].split(" ")
-					channel_privmsg = msg[1].split("PRIVMSG")[1].strip()
-					user = msg[1].split("!")[0]
-				except:
-					print("Error while resplitting:\n=============")
-					print("msg:\n{}\n=============".format(msg))
-					print("resp:\n{}".format(resp))
-					# TODO: Error-Log to file
-					continue
+					if message[0] == "funnymomentspog":
+						print_debug("Codeword triggered! Channel: {} Username: {}".format(channel, username))
 
-				if msg_split[0] == "funnymomentspog":
-					print(bcolors.GREEN + "Channel: {} => {}".format(channel_privmsg, msg_split[0]))
-
+'''
 				elif msg_split[0] == "!raffle":
 					print(bcolors.GREEN + "Channel: {} => !raffle".format(channel_privmsg))
 					if is_live(channel_privmsg) is True:
@@ -172,9 +156,20 @@ def loop():
 						print(bcolors.GREEN + "BOT: {} tried to fool us :P".format(channel_privmsg))
 '''
 
-def print_chat(channel, username, buffer_split):
+def get_message(buffer_split):
+	# Remove /me or the Column at the first word
+	if buffer_split[3] == ':\x01ACTION':
+		message = buffer_split[4:]
+		message[len(message) - 1] = message[len(message) - 1][:-1]
+	else:
+		message = buffer_split[3:]
+		message[0] = message[0][1:]
+	return message
+
+
+def print_chat(channel, username, message):
 	irc_string = "{} {}: ".format(channel, username)
-	for element in buffer_split:
+	for element in message:
 		irc_string += element + " "
 	print(bcolors.LIGHT_WHITE + irc_string)
 
@@ -198,14 +193,6 @@ def is_owner(channel_privmsg, user):
 	else:
 		print(bcolors.GREEN + "User: {} is not owner. \n {} tried to fool us !!!!".format(user, user))
 		return False
-
-
-# ====================================================================================================================
-# DEBUG
-
-
-def print_buffer_split(buffer_split):
-	print(bcolors.CYAN + "{}".format(buffer_split))
 
 
 # ====================================================================================================================
