@@ -108,7 +108,7 @@ def is_owner(channel_privmsg, user):
 		print(bcolors.GREEN + "User: {} is owner".format(user))
 		return True
 	else:
-		print(bcolors.GREEN + "User: {} is not owner. \n {} tried to fool us !!!!".format(user))
+		print(bcolors.GREEN + "User: {} is not owner. \n {} tried to fool us !!!!".format(user, user))
 		return False
 
 
@@ -166,8 +166,8 @@ if __name__ == "__main__":
 					user = msg[1].split("!")[0]
 				except:
 					print("Error while resplitting:\n=============")
-					print("msg:\n" + msg + "\n=============")
-					print("resp:\n" + resp)
+					print("msg:\n{}\n=============".format(msg))
+					print("resp:\n{}".format(resp))
 					# TODO: Error-Log to file
 					continue
 				
