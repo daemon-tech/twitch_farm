@@ -53,6 +53,28 @@ def get_data(cfg):
 	return [username, token, server, port]
 
 
+def connect(cfg, username, token, server, port):
+	from modules.colors import bcolors
+
+	try:
+		global ircsocket
+		ircsocket = socket.socket()
+		ircsocket.connect((server, port))
+		sock_token = "PASS {}\n".format(token)
+		sock_username = "NICK {}\n".format(username)
+
+		# Authentification
+		try:
+			ircsocket.send(sock_token.encode("utf-8"))
+			ircsocket.send(sock_username.encode("utf-8"))
+			for i in cfg['channels']:
+				sock_channel = "JOIN {}\n".format(i)
+				ircsocket.send(sock_channel.encode("utf-8"))
+		except:
+			print(bcolors.RED + "DEBUG: #Authentification failed")
+	except:
+		print(bcolors.RED + "DEBUG: Connection failed")
+
 class IRC:
 	
 	def __init__(self, username, token, server, port):
@@ -60,31 +82,6 @@ class IRC:
 		self.port = port
 		self.token = token
 		self.user = username
-		
-	def connection(self, username, token, server, port):
-		from modules.colors import bcolors
-		
-		try:
-			global ircsocket
-			ircsocket = socket.socket()
-			ircsocket.connect((server, port))
-			#print(bcolors.RED + "DEBUG: Connection success: {}, {}".format(server, port))
-			cFile = open('lib/db/config/config.json')
-			channels = json.load(cFile)
-			sock_token = "PASS {}\n".format(data[1])
-			sock_username = "NICK {}\n".format(data[0])
-			
-			#Authentification
-			try:
-				ircsocket.send(sock_token.encode("utf-8"))
-				ircsocket.send(sock_username.encode("utf-8"))
-				for i in channels['channels']:
-					sock_channel = "JOIN {}\n".format(i)
-					ircsocket.send(sock_channel.encode("utf-8"))
-			except:
-				print(bcolors.RED + "DEBUG: #Authentification failed")
-		except:
-			print(bcolors.RED + "DEBUG: Connection failed")
 			
 	def receive(self):
 		return ircsocket.recv(4096).decode("utf-8")
@@ -129,8 +126,8 @@ if __name__ == "__main__":
 	config = get_config()
 	data = get_data(config)
 
-	get = IRC(data[0], data[1], data [2], data[3])
-	get.connection(data[0], data[1], data [2], data[3])
+	connect(config, data[0], data[1], data[2], data[3])
+
 	bot = IRC(data[0], data[1], data [2], data[3])
 	
 	print(" ")
