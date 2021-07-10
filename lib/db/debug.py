@@ -127,7 +127,7 @@ def loop():
 		if buffer is not None:
 			buffer_split = buffer.split()
 
-			print_debug(buffer_split)
+			#print_debug(buffer_split)
 
 			if buffer_split[0] == 'PING':
 				send(socket, "PONG", "")
