@@ -188,7 +188,6 @@ def print_chat(color, channel, username, message):
 def is_live(channel):
 
 	thumbnail = requests.get("https://static-cdn.jtvnw.net/previews-ttv/live_user_{}-1x1.jpg".format(channel[1:]))
-	print_debug(format(thumbnail.history))
 	if format(thumbnail.history) == '[]':
 		return True
 	elif format(thumbnail.history) == '[<Response [302]>]':
