@@ -129,15 +129,17 @@ def loop():
 				channel = buffer_split[2]
 				username = buffer_split[0][1:].split('!')[0]
 
-				# Remove /me or the Column at the first word
-				if buffer_split[3] == ':\x01ACTION':
-					buffer_split.pop(3)
-				else:
-					buffer_split[3] = buffer_split[3][1:]
-
 				if buffer_split[1] == 'PRIVMSG':
+					# Remove /me or the Column at the first word
+					if buffer_split[3] == ':\x01ACTION':
+						message = buffer_split[4:]
+					else:
+						message = buffer_split[3:]
+						message[0] = message[0][1:]
+
+
 					if show_chat is True:
-						print_chat(channel, username, buffer_split[3:])
+						print_chat(channel, username, message)
 
 			'''
 			if resplit[1] == "PRIVMSG":
