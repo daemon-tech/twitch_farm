@@ -65,7 +65,7 @@ def connect(cfg, username, token, server, port):
 		sock_token = "PASS {}\n".format(token)
 		sock_username = "NICK {}\n".format(username)
 
-		# Authentification
+		# Authentication
 		irc_socket.send(sock_token.encode("utf-8"))
 		irc_socket.send(sock_username.encode("utf-8"))
 		for i in cfg['channels']:
@@ -75,7 +75,7 @@ def connect(cfg, username, token, server, port):
 		return irc_socket
 
 	except Exception as err:
-		print(bcolors.RED + "Error while authentificating:\n")
+		print(bcolors.RED + "Error while authenticating:\n")
 		print(err)
 		print("\n The program will now exit.")
 		exit()
