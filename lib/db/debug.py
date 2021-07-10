@@ -90,7 +90,7 @@ def send(irc_socket, command, message):
 	irc_socket.send(c)
 
 
-def answer(channel_privmsg, message):
+def answer(irc_socket, channel_privmsg, message):
 	irc_message = "PRIVMSG {} :{}\r\n".format(channel_privmsg, message).encode("utf-8")
 	irc_socket.send(irc_message)
 
@@ -98,7 +98,7 @@ def answer(channel_privmsg, message):
 # =====================================================================================================================
 
 
-def isLiveBroadcast(channel_privmsg):
+def is_live(channel_privmsg):
 	channel_name =  channel_privmsg[1:]
 	contents = requests.get('https://www.twitch.tv/' + channel_name).content.decode('utf-8')
 	if 'isLiveBroadcast' in contents:
@@ -174,12 +174,12 @@ if __name__ == "__main__":
 
 				elif msg_split[0] == "!raffle":
 					print(bcolors.GREEN + "Channel: {} => !raffle".format(channel_privmsg))
-					if isLiveBroadcast(channel_privmsg) is True:
+					if is_live(channel_privmsg) is True:
 						if is_owner(channel_privmsg, user) is True:
 							sleep(10)
 							print(bcolors.BLUE + "BOT: Send '!join' to Channel: {}".format(channel_privmsg)) 
 							answer(socket, channel_privmsg, '!join')
 						elif is_owner(channel_privmsg, user) is False:
 							print(bcolors.RED + "---")
-					elif isLiveBroadcast(channel_privmsg) is False:
+					elif is_live(channel_privmsg) is False:
 						print(bcolors.GREEN + "BOT: {} tried to fool us :P".format(channel_privmsg))
