@@ -114,20 +114,18 @@ def loop():
 			# Filter Chat into string and append space character
 			if show_chat is True:
 				try:
-					buffer_splited = buffer.split()
+					buffer_split = buffer.split()
 
-					def buffer_to_irc_chat(buffer_splited):
-						irc_string = ""
-						for i in range(0, 2):
-							buffer_splited.pop(i)
-						for element in buffer_splited:
-							irc_string += element + " "
-						return irc_string
+					irc_string = ""
+					for i in range(0, 2):
+						buffer_split.pop(i)
+					for element in buffer_split:
+						irc_string += element + " "
 
-					print(bcolors.LIGHT_WHITE + buffer_to_irc_chat(buffer_splited))
-				except:
-					print(bcolors.RED + "Exception in buffer_to_irc_chat(buffer_splited):")
-					pass
+					print(bcolors.LIGHT_WHITE + irc_string)
+				except Exception as err:
+					print(bcolors.RED + "Error: Error displaying chat.\nException:\n{}".format(err))
+					continue
 
 			resp, buffer = buffer.split('\n', 1)
 			if resp.startswith('PING'):
