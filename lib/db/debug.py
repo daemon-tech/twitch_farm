@@ -26,6 +26,12 @@ def print_spacer():
 	print(bcolors.LIGHT_WHITE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
 	print(bcolors.PURPLE + " ")
 
+def print_info(info_string):
+	print(bcolors.PURPLE + info_string)
+
+def print_error(err_string):
+	print(bcolors.RED + err_string)
+
 
 # =====================================================================================================================
 
@@ -45,7 +51,7 @@ def get_data():
 		username = config['credentials']['username']
 		token = config['credentials']['token']
 	except KeyError:
-		print(bcolors.RED + "Error: Credentials not exist or are entered incorrectly. Program will now exit.")
+		print_error("Error: Credentials not exist or are entered incorrectly. Program will now exit.")
 		exit()
 
 	server = 'irc.chat.twitch.tv'
@@ -58,7 +64,7 @@ def get_show_chat():
 	try:
 		return config['show_chat']
 	except KeyError:
-		print(bcolors.RED + "Error: Can't find 'show_chat' configuration. Is your config.json corrupted?"
+		print_error("Error: Can't find 'show_chat' configuration. Is your config.json corrupted?"
 							"Program will now exit.")
 		exit()
 
@@ -68,26 +74,19 @@ def get_show_chat():
 
 def connect():
 
-	try:
-		irc_socket = socket.socket()
-		irc_socket.connect((data[2], data[3]))
-		sock_token = "PASS {}\n".format(data[1])
-		sock_username = "NICK {}\n".format(data[0])
+	irc_socket = socket.socket()
+	irc_socket.connect((data[2], data[3]))
+	sock_token = "PASS {}\n".format(data[1])
+	sock_username = "NICK {}\n".format(data[0])
 
-		# Authentication
-		irc_socket.send(sock_token.encode("utf-8"))
-		irc_socket.send(sock_username.encode("utf-8"))
-		for i in config['channels']:
-			sock_channel = "JOIN #{}\n".format(i)
-			irc_socket.send(sock_channel.encode("utf-8"))
+	# Authentication
+	irc_socket.send(sock_token.encode("utf-8"))
+	irc_socket.send(sock_username.encode("utf-8"))
+	for i in config['channels']:
+		sock_channel = "JOIN #{}\n".format(i)
+		irc_socket.send(sock_channel.encode("utf-8"))
 
-		return irc_socket
-
-	except Exception as err:
-		print(bcolors.RED + "Error while authenticating:\n")
-		print(err)
-		print("\n The program will now exit.")
-		exit()
+	return irc_socket
 
 
 def receive(irc_socket):
@@ -111,15 +110,13 @@ def loop():
 		buffer = receive(socket)
 		if buffer is not None:
 
-			# Filter Chat into string and append space character
 			if show_chat is True:
 				buffer_split = buffer.split()
-				print(bcolors.CYAN + "Debug buffer_split:\n=============\n{}\n==============".format(buffer_split))
 
 				if buffer_split[1] == '001':
-					print(bcolors.LIGHT_WHITE + "Successfully logged in.")
+					print_info("Successfully logged in.")
 				elif buffer_split[1] == 'JOIN':
-					print(bcolors.LIGHT_WHITE + "Joining channels...")
+					print_info("Joining channels...")
 				elif buffer_split[1] == 'PRIVMSG':
 					irc_string = ""
 
