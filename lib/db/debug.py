@@ -163,6 +163,8 @@ def loop():
 					print_info("Login successful.")
 				elif buffer_split[1] == 'JOIN':
 					print_info("Attempting to connect to all channels...")
+				elif buffer_split[1] == '353':
+					pass
 				else:
 					print_error("Unknown IRC Command.\nbuffer_split:\n{}".format(buffer_split))
 
