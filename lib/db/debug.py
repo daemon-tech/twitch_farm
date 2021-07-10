@@ -54,6 +54,15 @@ def get_data():
 	return [username, token, server, port]
 
 
+def get_show_chat():
+	try:
+		return config['show_chat']
+	except KeyError:
+		print(bcolors.RED + "Error: Can't find 'show_chat' configuration. Is your config.json corrupted?"
+							"Program will now exit.")
+		exit()
+
+
 # =====================================================================================================================
 
 
@@ -101,8 +110,6 @@ def loop():
 	while True:
 		buffer = receive(socket)
 		if buffer is not None:
-
-			show_chat = True
 
 			# Filter Chat into string and append space character
 			if show_chat is True:
@@ -184,6 +191,7 @@ if __name__ == "__main__":
 
 		config = get_config()
 		data = get_data()
+		show_chat = get_show_chat()
 		socket = connect()
 
 		print_spacer()

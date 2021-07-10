@@ -9,5 +9,6 @@
     "#daem0nnnn"
   ],
   "debug": false,
+  "show_chat": true,
   "quickstart": false
 }
