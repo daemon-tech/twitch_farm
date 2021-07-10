@@ -16,9 +16,15 @@ def init_update():
 		pass # TODO: Auto-Update using Git
 
 
-def banner():
+def print_banner():
 	title = Figlet(font="banner3-D")
 	print(bcolors.PURPLE + title.renderText("TFARMER"))
+
+def print_spacer():
+	print(" ")
+	print(" ")
+	print(bcolors.LIGHT_WHITE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
+	print(bcolors.PURPLE + " ")
 
 
 # =====================================================================================================================
@@ -112,17 +118,13 @@ def is_owner(channel_privmsg, user):
 
 if __name__ == "__main__":
 	init_update()
-	banner()
+	print_banner()
 
 	config = get_config()
 	data = get_data(config)
-
-	connect(config, data[0], data[1], data[2], data[3])
+	socket = connect(config, data[0], data[1], data[2], data[3])
 	
-	print(" ")
-	print(" ")
-	print(bcolors.LIGHT_WHITE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
-	print(bcolors.PURPLE + " ")
+	print_spacer()
 	
 	while True:
 		buffer = receive()
