@@ -160,19 +160,6 @@ def loop():
 					elif show_chat is True:
 						print_chat(bcolors.LIGHT_WHITE, channel, author, message)
 
-'''
-				elif msg_split[0] == "!raffle":
-					print(bcolors.GREEN + "Channel: {} => !raffle".format(channel_privmsg))
-					if is_live(channel_privmsg) is True:
-						if is_owner(channel_privmsg, user) is True:
-							sleep(10)
-							print(bcolors.BLUE + "BOT: Send '!join' to Channel: {}".format(channel_privmsg))
-							answer(socket, channel_privmsg, '!join')
-						elif is_owner(channel_privmsg, user) is False:
-							print(bcolors.RED + "---")
-					elif is_live(channel_privmsg) is False:
-						print(bcolors.GREEN + "BOT: {} tried to fool us :P".format(channel_privmsg))
-'''
 
 def get_message(buffer_split):
 	# Remove /me or the Column at the first word
