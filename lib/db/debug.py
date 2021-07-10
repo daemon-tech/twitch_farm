@@ -1,16 +1,11 @@
 import json
-import time
 import os
 import subprocess
 import socket
-import pyfiglet
-import sys
-import threading
 import requests
 
 from time import sleep
 from pyfiglet import Figlet
-from socket import gethostbyname
 
 subprocess.call('clear', shell=True)
 
