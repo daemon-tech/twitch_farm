@@ -14,12 +14,9 @@ from socket import gethostbyname
 
 subprocess.call('clear', shell=True)
 
-'''#Check dependencies
 def init_update():
-	try:
-		os.system("git pull")
-	except:
-		pass'''
+	if os.path.basename(__file__) == 'main.py':
+		pass # TODO: Auto-Update using Git
 
 def check_color():
 	try:
@@ -116,7 +113,8 @@ if __name__ == "__main__":
 	#data[1] = token
 	#data[2] = server
 	#data[3] = port
-	
+
+	init_update()
 	check_color()
 	banner()
 	input_data()
