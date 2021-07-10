@@ -120,7 +120,7 @@ def loop():
 
 		if buffer is not None:
 			buffer_split = buffer.split()
-			#print_buffer_split(buffer_split)
+			print_buffer_split(buffer_split)
 
 			if buffer_split[1] == 'PING':
 				send(socket, "PONG", "")
@@ -128,7 +128,12 @@ def loop():
 			else:
 				channel = buffer_split[2]
 				username = buffer_split[0][1:].split('!')[0]
-				buffer_split[3] = buffer_split[3][1:]
+
+				# Remove /me or the Column at the first word
+				if buffer_split[3] == ':\x01ACTION':
+					buffer_split.pop(3)
+				else:
+					buffer_split[3] = buffer_split[3][1:]
 
 				if buffer_split[1] == 'PRIVMSG':
 					if show_chat is True:
@@ -215,7 +220,6 @@ if __name__ == "__main__":
 
 		print_spacer()
 
-		print("Debug: Entering loop...")
 		loop()
 
 	except KeyboardInterrupt:
