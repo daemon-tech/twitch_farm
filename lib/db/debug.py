@@ -90,6 +90,15 @@ def isLiveBroadcast(channel_privmsg):
 		print(f"Channel: {channel_name} is offline")
 		return False
 
+def is_owner(channel_privmsg, user):
+	channel_name = channel_privmsg[1:]
+	if channel_name == user:
+		print(bcolors.GREEN + "User: {} is owner".format(user))
+		return True
+	else:
+		print(bcolors.GREEN + "User: {} is not owner. \n {} tried to fool us !!!!".format(user))
+		return False
+
 def input_data():
 	cfile = open('lib/db/config/config.json')
 	credentials = json.load(cfile)
@@ -164,7 +173,11 @@ if __name__ == "__main__":
 				elif msg_split[0] == "!raffle":
 					print(bcolors.GREEN + "Channel: {} => !raffle".format(channel_privmsg))
 					if isLiveBroadcast(channel_privmsg) is True:
-						sleep(10) 
-						bot.answer(channel_privmsg, '!joins')
+						if is_owner(channel_privmsg, user) is True:
+							sleep(10)
+							print(bcolors.BLUE + "BOT: Send '!join' to Channel: {}".format(channel_privmsg)) 
+							bot.answer(channel_privmsg, '!join')
+						elif is_owner(channel_privmsg, user) is False:
+							print(bcolors.RED + "---")
 					elif isLiveBroadcast(channel_privmsg) is False:
 						print(bcolors.GREEN + "BOT: {} tried to fool us :P".format(channel_privmsg))
