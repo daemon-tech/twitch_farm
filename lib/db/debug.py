@@ -86,7 +86,6 @@ def connect():
 	sock_token = "PASS {}\n".format(data[1])
 	sock_username = "NICK {}\n".format(data[0])
 
-	# Authentification
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
 	for i in config['channels']:
