@@ -21,8 +21,8 @@ def init_update():
 def check_color():
 	try:
 		from modules.colors import bcolors
-	except:
-		print(f"DEBUG: lib/db/modules/colors.py missing")
+	except ModuleNotFoundError:
+		print("modules/colors.py seems missing. Did you install this program correctly?")
 		exit()
 
 def banner():
