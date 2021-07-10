@@ -167,11 +167,11 @@ def get_message(buffer_split):
 	return message
 
 
-def print_chat(channel, username, message):
-	irc_string = "{} {}: ".format(channel, username)
+def print_chat(color, channel, username, message):
+	irc_string = "{}{} {}: ".format(color, channel, username)
 	for element in message:
 		irc_string += element + " "
-	print(bcolors.LIGHT_WHITE + irc_string)
+	print(irc_string)
 
 
 def is_live(channel_privmsg):
