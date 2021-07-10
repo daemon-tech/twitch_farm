@@ -27,13 +27,14 @@ def print_spacer():
 	print(" ")
 
 def print_info(info_string):
-	print(bcolors.PURPLE + info_string)
+	print("{}INFO: {}".format(bcolors.PURPLE, info_string))
 
 def print_error(err_string):
-	print(bcolors.RED + err_string)
+	print("{}ERROR: {}".format(bcolors.RED, err_string))
 
 
 # =====================================================================================================================
+# DATA
 
 
 def get_config():
@@ -51,7 +52,7 @@ def get_data():
 		username = config['credentials']['username']
 		token = config['credentials']['token']
 	except KeyError:
-		print_error("Error: Credentials not exist or are entered incorrectly. Program will now exit.")
+		print_error("Credentials not exist or are entered incorrectly. Program will now exit.")
 		exit()
 
 	server = 'irc.chat.twitch.tv'
@@ -64,12 +65,12 @@ def get_show_chat():
 	try:
 		return config['show_chat']
 	except KeyError:
-		print_error("Error: Can't find 'show_chat' configuration. Is your config.json corrupted?"
-							"Program will now exit.")
+		print_error("Can't find 'show_chat' configuration. Is your config.json corrupted? Program will now exit.")
 		exit()
 
 
 # =====================================================================================================================
+# Connection
 
 
 def connect():
@@ -104,6 +105,8 @@ def answer(irc_socket, channel_privmsg, message):
 
 
 # =====================================================================================================================
+# Core
+
 
 def loop():
 	while True:
@@ -116,38 +119,22 @@ def loop():
 			exit()
 
 		if buffer is not None:
+			buffer_split = buffer.split()
+			#print_buffer_split(buffer_split)
 
-			if show_chat is True:
-				buffer_split = buffer.split()
-
-				if buffer_split[1] == '001':
-					print_info("Successfully logged in.")
-				elif buffer_split[1] == 'JOIN':
-					print_info("Joining channels...")
-				elif buffer_split[1] == 'PRIVMSG':
-					irc_string = ""
-
-					#Get Username from first split and store it
-					username = buffer_split[0][1:].split('!')[0]
-
-					buffer_split = buffer_split[2:]
-					irc_string += buffer_split.pop(0)
-					irc_string += " {}: ".format(username)
-
-					#Remove Colon from first Chat Word
-					irc_string += "{} ".format(buffer_split.pop(0)[1:])
-
-					for element in buffer_split:
-						irc_string += element + " "
-					print(bcolors.LIGHT_WHITE + irc_string)
-
-
-			resp, buffer = buffer.split('\n', 1)
-			if resp.startswith('PING'):
+			if buffer_split[1] == 'PING':
 				send(socket, "PONG", "")
-				print(bcolors.PURPLE + "Pong send")
-			resplit = resp.strip().split()
+				print_info("Pong Send.")
+			else:
+				channel = buffer_split[2]
+				username = buffer_split[0][1:].split('!')[0]
+				buffer_split[3] = buffer_split[3][1:]
 
+				if buffer_split[1] == 'PRIVMSG':
+					if show_chat is True:
+						print_chat(channel, username, buffer_split[3:])
+
+			'''
 			if resplit[1] == "PRIVMSG":
 				try:
 					msg = resp.strip().split(":", 2)  # split(":", 2)
@@ -175,6 +162,13 @@ def loop():
 							print(bcolors.RED + "---")
 					elif is_live(channel_privmsg) is False:
 						print(bcolors.GREEN + "BOT: {} tried to fool us :P".format(channel_privmsg))
+'''
+
+def print_chat(channel, username, buffer_split):
+	irc_string = "{} {}: ".format(channel, username)
+	for element in buffer_split:
+		irc_string += element + " "
+	print(bcolors.LIGHT_WHITE + irc_string)
 
 
 def is_live(channel_privmsg):
@@ -196,6 +190,17 @@ def is_owner(channel_privmsg, user):
 	else:
 		print(bcolors.GREEN + "User: {} is not owner. \n {} tried to fool us !!!!".format(user, user))
 		return False
+
+
+# ====================================================================================================================
+# DEBUG
+
+
+def print_buffer_split(buffer_split):
+	print(bcolors.CYAN + "{}".format(buffer_split))
+
+
+# ====================================================================================================================
 
 
 if __name__ == "__main__":
