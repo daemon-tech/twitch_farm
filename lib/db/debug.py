@@ -1,11 +1,12 @@
 import json
 import os
+import requests
 import subprocess
 import socket
-import requests
 
-from time import sleep
+from modules.colors import bcolors
 from pyfiglet import Figlet
+from time import sleep
 
 subprocess.call('clear', shell=True)
 
@@ -16,9 +17,11 @@ def init_update():
 
 
 def banner():
-	from modules.colors import bcolors
 	title = Figlet(font="banner3-D")
 	print(bcolors.PURPLE + title.renderText("TFARMER"))
+
+
+# =====================================================================================================================
 
 
 def get_config():
@@ -36,7 +39,7 @@ def get_data(cfg):
 		username = cfg['credentials']['username']
 		token = cfg['credentials']['token']
 	except KeyError:
-		print("Credentials not exist or are entered incorrectly. Program will now exit.")
+		print(bcolors.RED + "Error: Credentials not exist or are entered incorrectly. Program will now exit.")
 		exit()
 
 	server = 'irc.chat.twitch.tv'
@@ -45,8 +48,10 @@ def get_data(cfg):
 	return [username, token, server, port]
 
 
+# =====================================================================================================================
+
+
 def connect(cfg, username, token, server, port):
-	from modules.colors import bcolors
 
 	try:
 		global ircsocket
@@ -110,7 +115,6 @@ def is_owner(channel_privmsg, user):
 
 
 if __name__ == "__main__":
-	from modules.colors import bcolors
 	init_update()
 	banner()
 
@@ -147,7 +151,7 @@ if __name__ == "__main__":
 				except:
 					print(bcolors.RED + "Exception in buffer_to_irc_chat(buffer_splited):")
 					pass
-			
+
 			resp, buffer = buffer.split('\n', 1)
 			if resp.startswith('PING'):
 				bot.send("PONG", "")
