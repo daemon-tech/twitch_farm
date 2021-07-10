@@ -14,4 +14,4 @@ class bcolors:
     LIGHT_BLUE = "\033[1;34m"
     LIGHT_PURPLE = "\033[1;35m"
     LIGHT_CYAN = "\033[1;36m"
-    LIGHT_WHITE = "\033[1;37m"	
+    WHITE = "\033[1;37m"	

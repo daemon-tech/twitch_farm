@@ -26,11 +26,11 @@ def print_banner():
 def print_spacer():
 	print(" ")
 	print(" ")
-	print(bcolors.LIGHT_WHITE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
+	print(bcolors.WHITE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
 	print(" ")
 
 def print_info(info_string):
-	print("{}INFO: {}".format(bcolors.PURPLE, info_string))
+	print("{}INFO:{} {}".format(bcolors.PURPLE, bcolors.WHITE, info_string))
 
 def print_error(err_string):
 	print("{}ERROR: {}".format(bcolors.RED, err_string))
@@ -86,12 +86,13 @@ def connect():
 	sock_token = "PASS {}\n".format(data[1])
 	sock_username = "NICK {}\n".format(data[0])
 
-	# Authentication
+	# Authentification
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
 	for i in config['channels']:
 		sock_channel = "JOIN #{}\n".format(i.lower())
 		irc_socket.send(sock_channel.encode("utf-8"))
+		print_info("Channel: {} joined.".format(i))
 
 	return irc_socket
 
@@ -158,11 +159,9 @@ def loop():
 							print_chat(bcolors.YELLOW, channel, author, message)
 							print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
 					elif show_chat is True:
-						print_chat(bcolors.LIGHT_WHITE, channel, author, message)
+						print_chat(bcolors.WHITE, channel, author, message)
 				elif buffer_split[1] == '001':
 					print_info("Login successful.")
-				elif buffer_split[1] == 'JOIN':
-					print_info("Attempting to connect to all channels...")
 				else:
 					pass
 					# TODO: Log to file
@@ -200,7 +199,7 @@ def is_live(channel):
 
 
 # ====================================================================================================================
-
+# Main
 
 if __name__ == "__main__":
 	try:
