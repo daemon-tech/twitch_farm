@@ -113,19 +113,30 @@ def loop():
 
 			# Filter Chat into string and append space character
 			if show_chat is True:
-				try:
-					buffer_split = buffer.split()
+				buffer_split = buffer.split()
+				print(bcolors.CYAN + "Debug buffer_split:\n=============\n{}\n==============".format(buffer_split))
 
+				if buffer_split[1] == '001':
+					print(bcolors.LIGHT_WHITE + "Successfully logged in.")
+				elif buffer_split[1] == 'JOIN':
+					print(bcolors.LIGHT_WHITE + "Joining channels...")
+				elif buffer_split[1] == 'PRIVMSG':
 					irc_string = ""
-					for i in range(0, 2):
-						buffer_split.pop(i)
+
+					#Get Username from first split and store it
+					username = buffer_split[0][1:].split('!')[0]
+
+					buffer_split = buffer_split[2:]
+					irc_string += buffer_split.pop(0)
+					irc_string += " {}: ".format(username)
+
+					#Remove Colon from first Chat Word
+					irc_string += "{} ".format(buffer_split.pop(0)[1:])
+
 					for element in buffer_split:
 						irc_string += element + " "
-
 					print(bcolors.LIGHT_WHITE + irc_string)
-				except Exception as err:
-					print(bcolors.RED + "Error: Error displaying chat.\nException:\n{}".format(err))
-					continue
+
 
 			resp, buffer = buffer.split('\n', 1)
 			if resp.startswith('PING'):
