@@ -1,12 +1,15 @@
 import json
 import os
+from pyfiglet import Figlet
+from random import randint
 import requests
 import subprocess
 import socket
+from time import sleep
 
 from modules.colors import bcolors
-from pyfiglet import Figlet
-from time import sleep
+
+
 
 subprocess.call('clear', shell=True)
 
