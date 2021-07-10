@@ -122,6 +122,7 @@ def loop():
 		except ConnectionResetError:
 			print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
 						"The program will now exit.")
+			# TODO: Reconnect
 			exit()
 
 		if buffer is not None:
@@ -159,6 +160,12 @@ def loop():
 							print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
 					elif show_chat is True:
 						print_chat(bcolors.LIGHT_WHITE, channel, author, message)
+				elif buffer_split[1] == '001':
+					print_info("Login successful.")
+				elif buffer_split[1] == 'JOIN':
+					print_info("Attempting to connect to all channels...")
+				else:
+					print_error("Unknown IRC Command.\nbuffer_split:\n{}".format(buffer_split))
 
 
 def get_message(buffer_split):
