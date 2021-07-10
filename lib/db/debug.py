@@ -149,7 +149,7 @@ if __name__ == "__main__":
 						return irc_string
 					print(bcolors.LIGHT_WHITE + buffer_to_irc_chat(buffer_splited))
 				except:
-					pritn(bcolors.RED + "Exception in buffer_to_irc_chat(buffer_splited):")
+					print(bcolors.RED + "Exception in buffer_to_irc_chat(buffer_splited):")
 					pass
 			
 			resp, buffer = buffer.split('\n', 1)
@@ -165,7 +165,10 @@ if __name__ == "__main__":
 					channel_privmsg = msg[1].split("PRIVMSG")[1].strip()
 					user = msg[1].split("!")[0]
 				except:
-					log(f"******\nMSG:\n{msg}\n\nOF MSG:\n{resp}\n")
+					print("Error while resplitting:\n=============")
+					print("msg:\n" + msg + "\n=============")
+					print("resp:\n" + resp)
+					# TODO: Error-Log to file
 					continue
 				
 				if msg_split[0] == "funnymomentspog":
