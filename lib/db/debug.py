@@ -37,8 +37,16 @@ def get_config():
 
 
 def get_data(cfg):
-	username = cfg['credentials']['username']
-	token = cfg['credentials']['token']
+	username=''
+	token=''
+
+	try:
+		username = cfg['credentials']['username']
+		token = cfg['credentials']['token']
+	except KeyError:
+		print("Credentials not exist or are entered incorrectly. Program will now exit.")
+		exit()
+
 	server = 'irc.chat.twitch.tv'
 	port = 6667
 
