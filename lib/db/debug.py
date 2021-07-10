@@ -179,25 +179,17 @@ def print_chat(color, channel, username, message):
 	print(irc_string)
 
 
-def is_live(channel_privmsg):
-	channel_name =  channel_privmsg[1:]
-	contents = requests.get('https://www.twitch.tv/' + channel_name).content.decode('utf-8')
-	if 'isLiveBroadcast' in contents:
-		print(f"Channel: {channel_name} is live")
-		return True
-	else:
-		print(f"Channel: {channel_name} is offline")
-		return False
+def is_live(channel):
 
-
-def is_owner(channel_privmsg, user):
-	channel_name = channel_privmsg[1:]
-	if channel_name == user:
-		print(bcolors.GREEN + "User: {} is owner".format(user))
+	thumbnail = requests.get("https://static-cdn.jtvnw.net/previews-ttv/live_user_{}-1x1.jpg".format(channel[1:]))
+	print_debug(format(thumbnail.history))
+	if format(thumbnail.history) == '[]':
 		return True
-	else:
-		print(bcolors.GREEN + "User: {} is not owner. \n {} tried to fool us !!!!".format(user, user))
+	elif format(thumbnail.history) == '[<Response [302]>]':
 		return False
+	else:
+		print_error("Unknown Status Code when checking thumbnail:\n{}\nThe raffle was skipped as security measurement."
+					.format(format(thumbnail.history)))
 
 
 # ====================================================================================================================
