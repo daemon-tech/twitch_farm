@@ -129,21 +129,36 @@ def loop():
 
 			print_debug(buffer_split)
 
-			if buffer_split[1] == 'PING':
+			if buffer_split[0] == 'PING':
 				send(socket, "PONG", "")
 				print_info("Pong Send.")
 			else:
 				channel = buffer_split[2]
-				username = buffer_split[0][1:].split('!')[0]
+				author = buffer_split[0][1:].split('!')[0]
 
 				if buffer_split[1] == 'PRIVMSG':
 					message = get_message(buffer_split)
 
-					if show_chat is True:
-						print_chat(channel, username, message)
-
 					if message[0] == "funnymomentspog":
-						print_debug("Codeword triggered! Channel: {} Username: {}".format(channel, username))
+						print_chat(bcolors.GREEN, channel, author, message)
+					elif message[0] == "!sraffle":
+						if channel[1:] == author:
+							if is_live(channel):
+								print_chat(bcolors.YELLOW, channel, author, message)
+								print("{}Valid Raffle detected in {}! Trying to participate..."
+									  .format(bcolors.LIGHT_GREEN, channel))
+								sleep(randint(30, 55))
+								answer(socket, channel, '!join')
+							else:
+								print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
+						else:
+							print_info("{} tried to launch a raffle in {}!".format(author, channel))
+					elif message[0] == "!join":
+						if author == data[0]:
+							print_chat(bcolors.YELLOW, channel, author, message)
+							print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
+					elif show_chat is True:
+						print_chat(bcolors.LIGHT_WHITE, channel, author, message)
 
 '''
 				elif msg_split[0] == "!raffle":
