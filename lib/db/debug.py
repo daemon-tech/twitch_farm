@@ -78,7 +78,7 @@ def connect():
 		irc_socket.send(sock_token.encode("utf-8"))
 		irc_socket.send(sock_username.encode("utf-8"))
 		for i in config['channels']:
-			sock_channel = "JOIN {}\n".format(i)
+			sock_channel = "JOIN #{}\n".format(i)
 			irc_socket.send(sock_channel.encode("utf-8"))
 
 		return irc_socket
@@ -174,6 +174,7 @@ def is_live(channel_privmsg):
 		print(f"Channel: {channel_name} is offline")
 		return False
 
+
 def is_owner(channel_privmsg, user):
 	channel_name = channel_privmsg[1:]
 	if channel_name == user:
@@ -196,6 +197,7 @@ if __name__ == "__main__":
 
 		print_spacer()
 
+		print("Debug: Entering loop...")
 		loop()
 
 	except KeyboardInterrupt:
