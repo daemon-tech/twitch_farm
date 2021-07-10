@@ -57,18 +57,16 @@ def start_main():
 
 def start_menue():
 	print("Modules correctly installed. Starting session?")
-	try:
-
-		start = input("[y/n]")
-		if start == "y" or start == "Y":
-			os.system("python3 lib/db/loader.py")
-
-	except KeyboardInterrupt:
-		print("\nProgram closed by user (CTRL+C)")
-		exit()
+	start = input("[y/n]")
+	if start == "y" or start == "Y":
+		os.system("python3 lib/db/loader.py")
 
 
 
 if __name__ == "__main__":
-	load()
-	start_main()
+	try:
+		load()
+		start_main()
+	except KeyboardInterrupt:
+		print("\nProgram closed by user (CTRL+C)")
+		exit()
