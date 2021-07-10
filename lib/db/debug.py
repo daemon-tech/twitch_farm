@@ -122,7 +122,6 @@ def loop():
 		except ConnectionResetError:
 			print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
 						"The program will now exit.")
-			# TODO: Reconnect
 			exit()
 
 		if buffer is not None:
