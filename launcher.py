@@ -4,6 +4,16 @@ import subprocess
 #check modules
 def load():
 	subprocess.call('clear', shell=True)
+
+	try:
+		from lib.db.modules.colors import bcolors
+	except ModuleNotFoundError:
+		print("lib/db/modules/colors.py seems missing. Did you install this program correctly?")
+		exit()
+	except ImportError:
+		print("lib/db/modules/colors.py seems to exist, but is corrupted. Did you install this program correctly?")
+		exit()
+
 	try:
 		import pyfiglet
 	except ModuleNotFoundError:

@@ -15,14 +15,6 @@ def init_update():
 		pass # TODO: Auto-Update using Git
 
 
-def check_color():
-	try:
-		from modules.colors import bcolors
-	except ModuleNotFoundError:
-		print("modules/colors.py seems missing. Did you install this program correctly?")
-		exit()
-
-
 def banner():
 	from modules.colors import bcolors
 	title = Figlet(font="banner3-D")
@@ -120,7 +112,6 @@ def is_owner(channel_privmsg, user):
 if __name__ == "__main__":
 	from modules.colors import bcolors
 	init_update()
-	check_color()
 	banner()
 
 	config = get_config()
