@@ -72,27 +72,23 @@ def connect(cfg, username, token, server, port):
 	except:
 		print(bcolors.RED + "DEBUG: Connection failed")
 
-class IRC:
-	
-	def __init__(self, username, token, server, port):
-		self.server = server
-		self.port = port
-		self.token = token
-		self.user = username
-			
-	def receive(self):
-		return ircsocket.recv(4096).decode("utf-8")
-	
-	def send(self, command, message):
-		c = "{} {}\r\n".format(command, message).encode("utf-8")
-		ircsocket.send(c)
-	def answer_irc(self, channel, message):
-		c = "PRIVMSG {} :{}\r\n".format(channel, message).encode("utf-8")
-			
-	def answer(self, channel_privmsg, message):
-		irc_message = "PRIVMSG {} :{}\r\n".format(channel_privmsg, message).encode("utf-8")
-		ircsocket.send(irc_message)
-#ask [server, port, token, user]
+
+def receive():
+	return ircsocket.recv(4096).decode("utf-8")
+
+
+def send(command, message):
+	c = "{} {}\r\n".format(command, message).encode("utf-8")
+	ircsocket.send(c)
+
+
+def answer(channel_privmsg, message):
+	irc_message = "PRIVMSG {} :{}\r\n".format(channel_privmsg, message).encode("utf-8")
+	ircsocket.send(irc_message)
+
+
+# =====================================================================================================================
+
 
 def isLiveBroadcast(channel_privmsg):
 	channel_name =  channel_privmsg[1:]
@@ -122,8 +118,6 @@ if __name__ == "__main__":
 	data = get_data(config)
 
 	connect(config, data[0], data[1], data[2], data[3])
-
-	bot = IRC(data[0], data[1], data [2], data[3])
 	
 	print(" ")
 	print(" ")
@@ -131,7 +125,7 @@ if __name__ == "__main__":
 	print(bcolors.PURPLE + " ")
 	
 	while True:
-		buffer = bot.receive()
+		buffer = receive()
 		if buffer is not None:
 			
 			show_chat = False
@@ -154,7 +148,7 @@ if __name__ == "__main__":
 
 			resp, buffer = buffer.split('\n', 1)
 			if resp.startswith('PING'):
-				bot.send("PONG", "")
+				send("PONG", "")
 				print(bcolors.PURPLE + "Pong send")
 			resplit = resp.strip().split()
 
@@ -180,7 +174,7 @@ if __name__ == "__main__":
 						if is_owner(channel_privmsg, user) is True:
 							sleep(10)
 							print(bcolors.BLUE + "BOT: Send '!join' to Channel: {}".format(channel_privmsg)) 
-							bot.answer(channel_privmsg, '!join')
+							answer(channel_privmsg, '!join')
 						elif is_owner(channel_privmsg, user) is False:
 							print(bcolors.RED + "---")
 					elif isLiveBroadcast(channel_privmsg) is False:
