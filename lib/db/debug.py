@@ -16,10 +16,10 @@ subprocess.call('clear', shell=True)
 
 '''#Check dependencies
 def init_update():
-    try:
-        os.system("git pull")
-    except:
-        pass'''
+	try:
+		os.system("git pull")
+	except:
+		pass'''
 
 def check_color():
 	try:
