@@ -83,7 +83,7 @@ def connect():
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
 	for i in config['channels']:
-		sock_channel = "JOIN #{}\n".format(i)
+		sock_channel = "JOIN #{}\n".format(i.lower())
 		irc_socket.send(sock_channel.encode("utf-8"))
 
 	return irc_socket
