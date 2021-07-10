@@ -9,3 +9,6 @@ __pycache__/
 
 # Actual Configuration
 config.json
+
+#
+*.swp
