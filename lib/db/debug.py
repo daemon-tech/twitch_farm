@@ -126,7 +126,6 @@ def answer(irc_socket, channel, message):
 
 def loop(irc_socket):
 	buffer = b''
-	buffer_decoded = ''
 	while True:
 		while True:
 			try:
