@@ -139,9 +139,9 @@ def channel_show(channel, channel_set_, channel_color_dict_):
 				channel_color_dict_[channel.lower()] = eval('bcolors.{}'
 															.format(config['channels'][channel]['channel_color']))
 			except AttributeError:
-				pass
+				raise KeyError
 	except KeyError:
-		pass
+		channel_color_dict_[channel.lower()] = ''
 
 
 # =====================================================================================================================
