@@ -41,22 +41,22 @@ def print_spacer():
 	print(" ")
 
 def print_info(info_string):
-	print("{}{}[INFO]  {}{}".format(bcolors.PURPLE, timestamp(), bcolors.WHITE, info_string))
+	print("{}{}[INFO]  {}{}".format(timestamp(), bcolors.PURPLE, bcolors.WHITE, info_string))
 
 def print_error(err_string):
-	print("{}{}[ERROR] {}".format(bcolors.RED, timestamp(), err_string))
+	print("{}{}[ERROR] {}".format(timestamp(), bcolors.RED,  err_string))
 
 def print_debug(debug_string):
 	try:
 		if config['debug_output']:
-			print("{}{}[DEBUG] {}".format(bcolors.CYAN, timestamp(), debug_string))
+			print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))
 	except KeyError:
 		pass
 
 
 def timestamp():
 	x = datetime.datetime.now()
-	return x.strftime('[%d.%m.%y %H:%M:%S]')
+	return x.strftime('{}[%d.%m.%y %H:%M:%S]'.format(bcolors.PURPLE))
 
 
 # =====================================================================================================================
@@ -292,7 +292,7 @@ def evaluate_message(channel, author, message):
 
 
 def print_chat(color, channel, username, message):
-	irc_string = "{}{} {} {}: ".format(color, timestamp(), channel, username)
+	irc_string = "{}{} {} {}: ".format(timestamp(), color,  channel, username)
 	for element in message:
 		irc_string += element + " "
 	print(irc_string)
