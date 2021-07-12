@@ -113,18 +113,25 @@ def connect():
 			print_debug('Requesting to join channel #{}...'.format(channel))
 			irc_socket.send(sock_channel.encode("utf-8"))
 
-			# Using the channel loop to create a list of all channels which allow
 			try:
-				if config['channels'][channel]['show_chat']:
-					chat_set_.add(channel.lower())
+				if config['show_chat']:
+					# Using the channel loop to create a list of all channels which allow
+					try:
+						if config['channels'][channel]['show_chat']:
+							chat_set_.add(channel.lower())
+					except KeyError:
+						print_info('Missing key "show_chat" for channel {} in config.json.'
+								   'Assumes "True"...'.format(channel))
+						chat_set_.add(channel.lower())
 			except KeyError:
-				print_info('Missing key "show_chat" for channel {} in config.json. Assumes "True"...'.format(channel))
-				chat_set_.add(channel.lower())
-		return irc_socket, chat_set_
+				print_error("Can't find global 'show_chat' key. Is your config.json corrupted? Program will now exit.")
+				exit()
 	except KeyError:
 		print_error('Could not find key "channels". Is your config.json corrupted?'
 					'The program will now exit.')
 		exit()
+
+	return irc_socket, chat_set_
 
 
 def receive(irc_socket):
