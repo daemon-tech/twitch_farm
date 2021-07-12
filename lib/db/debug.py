@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 from pyfiglet import Figlet
@@ -7,6 +8,7 @@ import subprocess
 import socket
 import sys
 from time import sleep
+from threading import Thread
 
 from modules.colors import bcolors
 
@@ -14,6 +16,8 @@ from modules.colors import bcolors
 SERVER = 'irc.twitch.tv'
 PORT = 6667
 IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
+
+global TIMEOUT
 
 subprocess.call('clear', shell=True)
 
@@ -37,17 +41,22 @@ def print_spacer():
 	print(" ")
 
 def print_info(info_string):
-	print("{}INFO:{} {}".format(bcolors.PURPLE, bcolors.WHITE, info_string))
+	print("{}{}[INFO]  {}{}".format(bcolors.PURPLE, timestamp(), bcolors.WHITE, info_string))
 
 def print_error(err_string):
-	print("{}ERROR: {}".format(bcolors.RED, err_string))
+	print("{}{}[ERROR] {}".format(bcolors.RED, timestamp(), err_string))
 
 def print_debug(debug_string):
 	try:
 		if config['debug_output']:
-			print("{}DEBUG: {}".format(bcolors.CYAN, debug_string))
+			print("{}{}[DEBUG] {}".format(bcolors.CYAN, timestamp(), debug_string))
 	except KeyError:
 		pass
+
+
+def timestamp():
+	x = datetime.datetime.now()
+	return x.strftime('[%d.%m.%y %H:%M:%S]')
 
 
 # =====================================================================================================================
@@ -79,6 +88,46 @@ def get_credentials():
 	print_debug('Token ends with {}'.format(token[:3]))
 
 	return [username, token]
+
+
+def get_sets():
+	channel_set_ = set()
+	user_set_ = set()
+	word_set_ = set()
+
+	try:
+		for channel in config['channels']:
+			try:
+				if config['show_chat']:
+					# Using the channel loop to create a list of all channels which allow
+					try:
+						if config['channels'][channel]['show_chat']:
+							channel_set_.add(channel.lower())
+					except KeyError:
+						print_info('Missing key "show_chat" for channel {} in config.json.'
+								   'Assumes "True"...'.format(channel))
+						channel_set_.add(channel.lower())
+			except KeyError:
+				print_error("Can't find global 'show_chat' key. Is your config.json corrupted? Program will now exit.")
+				exit()
+	except KeyError:
+		print_error('Could not find key "channels". Is your config.json corrupted?'
+					'The program will now exit.')
+		exit()
+
+	try:
+		for user in config['ignored_users']:
+			user_set_.add(user.lower())
+	except KeyError:
+		pass
+
+	try:
+		for word in config['ignored_words']:
+			word_set_.add(word.lower())
+	except KeyError:
+		pass
+
+	return channel_set_, user_set_, word_set_
 
 
 # =====================================================================================================================
@@ -119,6 +168,19 @@ def answer(irc_socket, channel, message):
 	print_debug('Sending message {}'.format(irc_message))
 	irc_socket.send('{}\r\n'.format(irc_message).encode("utf-8"))
 
+def connectivity():
+	global TIMEOUT
+	TIMEOUT = 300
+	while True:
+		sleep(1)
+		TIMEOUT -= 1
+		print_debug('TIMEOUT: {}'.format(TIMEOUT))
+		if TIMEOUT == 0:
+			print_error("Lost connection to the socket. Waiting a few seconds to attempt restart...")
+			sleep(5)
+			os.execv(sys.executable, ['python3'] + [os.path.abspath(sys.argv[0])])
+
+
 
 # =====================================================================================================================
 # Core
@@ -140,6 +202,7 @@ def loop(irc_socket):
 				buffer_decoded = buffer.decode('utf-8')
 				break
 			except UnicodeDecodeError:
+				#An unicode symbol was split over 2 different buffers. Keep current buffer and receive again.
 				pass
 
 		if buffer_decoded is not None:
@@ -159,10 +222,12 @@ def loop(irc_socket):
 def evaluate_response(response_split):
 	# [PING, SERVER]
 	if response_split[0] == 'PING':
+		global TIMEOUT
+		TIMEOUT = 300
 		send(socket, "PONG", "")
 		print_info("Pong Send.")
 	#[SERVER, 001, username, welcome message]
-	if response_split[1] == '001':
+	elif response_split[1] == '001':
 		print_info("Login successful.")
 	#[username.server, JOIN, channel]
 	elif response_split[1] == '353':
@@ -177,8 +242,8 @@ def evaluate_response(response_split):
 	elif response_split[1] in IGNORED_COMMANDS:
 		print_debug('Ignored response.')
 	else:
-		pass
-		# TODO Log this shit
+		print_error('Found Unknown IRC Command with Status-Code {}. If you see this message, please report this'
+					'accident to the developers.\nresponse_split: {}'.format(response_split[1], response_split))
 
 
 
@@ -203,8 +268,9 @@ def evaluate_message(channel, author, message):
 				print_chat(bcolors.YELLOW, channel, author, message)
 				print("{}Valid Raffle detected in {}! Trying to participate..."
 					  .format(bcolors.LIGHT_GREEN, channel))
-				sleep(randint(30, 55))
-				answer(socket, channel, '!join')
+				s = Thread(target=send_random, args=(30, 55, channel, '!join'))
+				s.daemon = True
+				s.start()
 			else:
 				print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
 		else:
@@ -214,17 +280,19 @@ def evaluate_message(channel, author, message):
 			print_chat(bcolors.YELLOW, channel, author, message)
 			print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
 	else:
-		try:
-			if config['show_chat'] is True:
-				print_chat(bcolors.WHITE, channel, author, message)
-		except KeyError:
-			print_error(
-				"Can't find 'show_chat' configuration. Is your config.json corrupted? Program will now exit.")
-			exit()
+		if config['show_chat'] is True:
+			if channel[1:] in channel_set:
+				if not message[0].lower() in word_set:
+					if not author in user_set:
+						print_chat(bcolors.WHITE, channel, author, message)
+					else:
+						print_debug('Message was by ignored user. Skipping...')
+				else:
+					print_debug('Message started with an ignored word. Skipping...')
 
 
 def print_chat(color, channel, username, message):
-	irc_string = "{}{} {}: ".format(color, channel, username)
+	irc_string = "{}{} {} {}: ".format(color, timestamp(), channel, username)
 	for element in message:
 		irc_string += element + " "
 	print(irc_string)
@@ -242,6 +310,12 @@ def is_live(channel):
 					.format(format(thumbnail.history)))
 
 
+def send_random(early, late, channel, message):
+	sleep(randint(early, late))
+	answer(socket, channel, message)
+	print_chat(bcolors.LIGHT_GREEN, channel, credentials[0], message)
+
+
 # ====================================================================================================================
 # Main
 
@@ -252,10 +326,13 @@ if __name__ == "__main__":
 		print_banner()
 
 		credentials = get_credentials()
+		channel_set, user_set, word_set = get_sets()
 		socket = connect()
+		c = Thread(target=connectivity)
+		c.daemon = True
+		c.start()
 
 		print_spacer()
-
 		loop(socket)
 
 	except KeyboardInterrupt:
