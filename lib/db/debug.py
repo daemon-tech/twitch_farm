@@ -261,14 +261,9 @@ def evaluate_message(channel, author, message):
 			print_chat(bcolors.YELLOW, channel, author, message)
 			print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
 	else:
-		try:
-			if config['show_chat'] is True:
-				if channel[1:] in chat_set:
-					print_chat(bcolors.WHITE, channel, author, message)
-		except KeyError:
-			print_error(
-				"Can't find global 'show_chat' key. Is your config.json corrupted? Program will now exit.")
-			exit()
+		if config['show_chat'] is True:
+			if channel[1:] in chat_set:
+				print_chat(bcolors.WHITE, channel, author, message)
 
 
 def print_chat(color, channel, username, message):
