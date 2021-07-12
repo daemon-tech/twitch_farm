@@ -200,8 +200,8 @@ def evaluate_response(response_split):
 	elif response_split[1] in IGNORED_COMMANDS:
 		print_debug('Ignored response.')
 	else:
-		pass
-		# TODO Log this shit
+		print_error('Found Unknown IRC Command with Status-Code {}. If you see this message, please report this'
+					'accident to the developers.\nresponse_split: {}'.format(response_split[1], response_split))
 
 
 
