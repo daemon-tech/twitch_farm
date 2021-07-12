@@ -134,9 +134,9 @@ def loop(irc_socket):
 				buffer += receive(irc_socket, buffer_size)
 			except ConnectionResetError:
 				print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
-							"Waiting a few seconds to attempt restart...")
+							" Waiting a few seconds to attempt restart...")
 				sleep(5)
-				os.execv(sys.argv[0], sys.argv)
+				os.execv(sys.executable, ['python3'] + [os.path.abspath(sys.argv[0])])
 			break
 
 		if buffer is not None:
