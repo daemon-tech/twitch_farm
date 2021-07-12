@@ -13,7 +13,7 @@ from modules.colors import bcolors
 
 SERVER = 'irc.twitch.tv'
 PORT = 6667
-IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376']
+IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
 subprocess.call('clear', shell=True)
 
@@ -152,9 +152,6 @@ def evaluate_response(response_split):
 	if response_split[1] == '001':
 		print_info("Login successful.")
 	#[username.server, JOIN, channel]
-	elif response_split[1] == 'JOIN':
-		print_info("Requesting to join channel {}...".format(response_split[2]))
-	#[username.server, 353, username, =, channel, :username]
 	elif response_split[1] == '353':
 		print_info("Joined channel {}.".format(response_split[4]))
 	#[username.server, PRIVMSG, channel, :message, ...]
