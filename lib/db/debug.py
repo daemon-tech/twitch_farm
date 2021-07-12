@@ -90,6 +90,46 @@ def get_credentials():
 	return [username, token]
 
 
+def get_sets():
+	channel_set_ = set()
+	user_set_ = set()
+	word_set_ = set()
+
+	try:
+		for channel in config['channels']:
+			try:
+				if config['show_chat']:
+					# Using the channel loop to create a list of all channels which allow
+					try:
+						if config['channels'][channel]['show_chat']:
+							channel_set_.add(channel.lower())
+					except KeyError:
+						print_info('Missing key "show_chat" for channel {} in config.json.'
+								   'Assumes "True"...'.format(channel))
+						channel_set_.add(channel.lower())
+			except KeyError:
+				print_error("Can't find global 'show_chat' key. Is your config.json corrupted? Program will now exit.")
+				exit()
+	except KeyError:
+		print_error('Could not find key "channels". Is your config.json corrupted?'
+					'The program will now exit.')
+		exit()
+
+	try:
+		for user in config['ignored_users']:
+			user_set_.add(user.lower())
+	except KeyError:
+		pass
+
+	try:
+		for word in config['ignored_words']:
+			word_set_.add(word.lower())
+	except KeyError:
+		pass
+
+	return channel_set_, user_set_, word_set_
+
+
 # =====================================================================================================================
 # Connection
 
@@ -105,33 +145,12 @@ def connect():
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
 
-	chat_set_ = set()
+	for channel in config['channels']:
+		sock_channel = "JOIN #{}\r\n".format(channel.lower())
+		print_debug('Requesting to join channel #{}...'.format(channel))
+		irc_socket.send(sock_channel.encode("utf-8"))
 
-	try:
-		for channel in config['channels']:
-			sock_channel = "JOIN #{}\r\n".format(channel.lower())
-			print_debug('Requesting to join channel #{}...'.format(channel))
-			irc_socket.send(sock_channel.encode("utf-8"))
-
-			try:
-				if config['show_chat']:
-					# Using the channel loop to create a list of all channels which allow
-					try:
-						if config['channels'][channel]['show_chat']:
-							chat_set_.add(channel.lower())
-					except KeyError:
-						print_info('Missing key "show_chat" for channel {} in config.json.'
-								   'Assumes "True"...'.format(channel))
-						chat_set_.add(channel.lower())
-			except KeyError:
-				print_error("Can't find global 'show_chat' key. Is your config.json corrupted? Program will now exit.")
-				exit()
-	except KeyError:
-		print_error('Could not find key "channels". Is your config.json corrupted?'
-					'The program will now exit.')
-		exit()
-
-	return irc_socket, chat_set_
+	return irc_socket
 
 
 def receive(irc_socket):
@@ -262,8 +281,14 @@ def evaluate_message(channel, author, message):
 			print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
 	else:
 		if config['show_chat'] is True:
-			if channel[1:] in chat_set:
-				print_chat(bcolors.WHITE, channel, author, message)
+			if channel[1:] in channel_set:
+				if not message[0].lower() in word_set:
+					if not author in user_set:
+						print_chat(bcolors.WHITE, channel, author, message)
+					else:
+						print_debug('Message was by ignored user. Skipping...')
+				else:
+					print_debug('Message started with an ignored word. Skipping...')
 
 
 def print_chat(color, channel, username, message):
@@ -288,6 +313,7 @@ def is_live(channel):
 def send_random(early, late, channel, message):
 	sleep(randint(early, late))
 	answer(socket, channel, message)
+	print_chat(bcolors.LIGHT_GREEN, channel, credentials[0], message)
 
 
 # ====================================================================================================================
@@ -300,7 +326,8 @@ if __name__ == "__main__":
 		print_banner()
 
 		credentials = get_credentials()
-		socket, chat_set = connect()
+		channel_set, user_set, word_set = get_sets()
+		socket = connect()
 		c = Thread(target=connectivity)
 		c.daemon = True
 		c.start()

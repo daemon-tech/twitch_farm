@@ -23,7 +23,7 @@
 	"debug": false,
 	"debug_output": false,
 	"show_chat": true,
-	"ignored_users": [],
-	"ignored_words": [],
+	"ignored_users": ["StreamElements", "TheAlphaBrian", "TheDeuceBag", "VonDiceBot"],
+	"ignored_words": ["roshSatchel", "roshGold", "daSafe", "daGold", "Puntos", "!join"],
 	"quickstart": false
 }
