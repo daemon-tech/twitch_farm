@@ -227,8 +227,9 @@ def evaluate_message(channel, author, message):
 				print_chat(bcolors.YELLOW, channel, author, message)
 				print("{}Valid Raffle detected in {}! Trying to participate..."
 					  .format(bcolors.LIGHT_GREEN, channel))
-				sleep(randint(30, 55))
-				answer(socket, channel, '!join')
+				s = Thread(target=send_random, args=(30, 55, channel, '!join'))
+				s.daemon = True
+				s.start()
 			else:
 				print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
 		else:
@@ -266,6 +267,11 @@ def is_live(channel):
 					.format(format(thumbnail.history)))
 
 
+def send_random(early, late, channel, message):
+	sleep(randint(early, late))
+	answer(socket, channel, message)
+
+
 # ====================================================================================================================
 # Main
 
@@ -277,9 +283,9 @@ if __name__ == "__main__":
 
 		credentials = get_credentials()
 		socket = connect()
-		t = Thread(target=connectivity)
-		t.daemon = True
-		t.start()
+		c = Thread(target=connectivity)
+		c.daemon = True
+		c.start()
 
 		print_spacer()
 		loop(socket)
