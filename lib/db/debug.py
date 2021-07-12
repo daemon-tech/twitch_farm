@@ -150,23 +150,14 @@ def loop(irc_socket):
 					buffer = buffer[len(response)+2:]
 					response_split = response.split()
 					print_debug('response_split: {}'.format(response_split))
-
-					if response_split:
-						# if not starting with ":" and ending with "tmi.twitch.tv" (Begin of a new IRC message):
-						if not re.match('^:.*tmi\.twitch\.tv', response_split[0]):
-							# [PING, SERVER]
-							if response_split[0] == 'PING':
-								send(socket, "PONG", "")
-								print_info("Pong Send.")
-							else:
-								buffer_size *= 2
-								print_info('Buffer-size exhausted. Increasing to {}...'.format(buffer_size))
-								buffer = ''
-						else:
-							evaluate_response(response_split)
+					evaluate_response(response_split)
 
 
 def evaluate_response(response_split):
+	# [PING, SERVER]
+	if response_split[0] == 'PING':
+		send(socket, "PONG", "")
+		print_info("Pong Send.")
 	#[SERVER, 001, username, welcome message]
 	if response_split[1] == '001':
 		print_info("Login successful.")
