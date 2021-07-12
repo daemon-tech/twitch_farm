@@ -15,8 +15,9 @@ from modules.colors import bcolors
 
 SERVER = 'irc.twitch.tv'
 PORT = 6667
-global TIMEOUT
 IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
+
+global TIMEOUT
 
 subprocess.call('clear', shell=True)
 
@@ -104,12 +105,26 @@ def connect():
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
 
-	for channel in config['channels']:
-		sock_channel = "JOIN #{}\r\n".format(channel.lower())
-		print_debug('Requesting to join channel #{}...'.format(channel))
-		irc_socket.send(sock_channel.encode("utf-8"))
+	chat_set_ = set()
 
-	return irc_socket
+	try:
+		for channel in config['channels']:
+			sock_channel = "JOIN #{}\r\n".format(channel.lower())
+			print_debug('Requesting to join channel #{}...'.format(channel))
+			irc_socket.send(sock_channel.encode("utf-8"))
+
+			# Using the channel loop to create a list of all channels which allow
+			try:
+				if config['channels'][channel]['show_chat']:
+					chat_set_.add(channel.lower())
+			except KeyError:
+				print_info('Missing key "show_chat" for channel {} in config.json. Assumes "True"...'.format(channel))
+				chat_set_.add(channel.lower())
+		return irc_socket, chat_set_
+	except KeyError:
+		print_error('Could not find key "channels". Is your config.json corrupted?'
+					'The program will now exit.')
+		exit()
 
 
 def receive(irc_socket):
@@ -241,10 +256,11 @@ def evaluate_message(channel, author, message):
 	else:
 		try:
 			if config['show_chat'] is True:
-				print_chat(bcolors.WHITE, channel, author, message)
+				if channel[1:] in chat_set:
+					print_chat(bcolors.WHITE, channel, author, message)
 		except KeyError:
 			print_error(
-				"Can't find 'show_chat' configuration. Is your config.json corrupted? Program will now exit.")
+				"Can't find global 'show_chat' key. Is your config.json corrupted? Program will now exit.")
 			exit()
 
 
@@ -282,7 +298,7 @@ if __name__ == "__main__":
 		print_banner()
 
 		credentials = get_credentials()
-		socket = connect()
+		socket, chat_set = connect()
 		c = Thread(target=connectivity)
 		c.daemon = True
 		c.start()

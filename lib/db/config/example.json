@@ -1,13 +1,35 @@
 {
   "credentials": {
-    "username": "twitch_username",
-    "token": "oauth:xyz"
+	"username": "twitch_username",
+	"token": "oauth:xyz"
   },
-  "channels": [
-    "purefallen",
-    "intelligencedi1",
-    "daem0nnnn"
-  ],
+  "channels": {
+	"PureFallen": {
+	  "show_chat": true,
+	  "ignored_users": [],
+	  "ignored_words": []
+	},
+	"daem0nnnn": {
+	  "show_chat": false,
+	  "ignored_users": [],
+	  "ignored_words": []
+	},
+	"ROSHTEIN": {
+	  "show_chat": false,
+	  "ignored_users": [],
+	  "ignored_words": []
+	},
+	"DeuceAce": {
+	  "show_chat": false,
+	  "ignored_users": [],
+	  "ignored_words": []
+	},
+	"VonDice": {
+	  "show_chat": false,
+	  "ignored_users": [],
+	  "ignored_words": []
+	}
+  },
   "debug": false,
   "debug_output": false,
   "show_chat": true,
