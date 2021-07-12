@@ -161,6 +161,7 @@ def loop(irc_socket):
 				buffer_decoded = buffer.decode('utf-8')
 				break
 			except UnicodeDecodeError:
+				#An unicode symbol was split over 2 different buffers. Keep current buffer and receive again.
 				pass
 
 		if buffer_decoded is not None:
