@@ -105,11 +105,7 @@ def connect():
 
 
 def receive(irc_socket):
-	try:
-		return irc_socket.recv(4096).decode("utf-8")
-	except UnicodeDecodeError:
-		print_error("'Couldn't decode buffer for whatever reason.")
-		exit()
+	return irc_socket.recv(4096)
 
 
 def send(irc_socket, command, message):
@@ -129,27 +125,33 @@ def answer(irc_socket, channel, message):
 
 
 def loop(irc_socket):
-	buffer = ''
+	buffer = b''
+	buffer_decoded = ''
 	while True:
 		while True:
 			try:
 				buffer += receive(irc_socket)
+				print_debug('buffer:\n{}\n'.format(buffer))
 			except ConnectionResetError:
 				print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
 							" Waiting a few seconds to attempt restart...")
 				sleep(5)
 				os.execv(sys.executable, ['python3'] + [os.path.abspath(sys.argv[0])])
-			break
+			try:
+				buffer_decoded = buffer.decode('utf-8')
+				break
+			except UnicodeDecodeError:
+				pass
 
-		if buffer is not None:
-			responses = buffer.split("\r\n")
+		if buffer_decoded is not None:
+			responses = buffer_decoded.split("\r\n")
 			print_debug('responses:\n{}\n'.format(responses))
 
 			for i, response in enumerate(responses):
 				# if not last response in responses:
 				if not i == len(responses)-1:
-					# remove response from buffer
-					buffer = buffer[len(response)+2:]
+					# remove response from buffer_decoded
+					buffer = buffer[len(response.encode('utf-8'))+2:]
 					response_split = response.split()
 					print_debug('response_split: {}'.format(response_split))
 					evaluate_response(response_split)
