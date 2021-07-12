@@ -2,7 +2,6 @@ import json
 import os
 from pyfiglet import Figlet
 from random import randint
-import re
 import requests
 import subprocess
 import socket
