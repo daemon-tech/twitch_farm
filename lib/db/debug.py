@@ -11,6 +11,9 @@ from time import sleep
 from modules.colors import bcolors
 
 
+server = 'irc.twitch.tv'
+port = 6667
+
 
 subprocess.call('clear', shell=True)
 
@@ -51,7 +54,7 @@ def get_config():
 	return json.load(config_file)
 
 
-def get_data():
+def get_credentials():
 	username=''
 	token=''
 
@@ -62,18 +65,7 @@ def get_data():
 		print_error("Credentials not exist or are entered incorrectly. Program will now exit.")
 		exit()
 
-	server = 'irc.chat.twitch.tv'
-	port = 6667
-
-	return [username, token, server, port]
-
-
-def get_show_chat():
-	try:
-		return config['show_chat']
-	except KeyError:
-		print_error("Can't find 'show_chat' configuration. Is your config.json corrupted? Program will now exit.")
-		exit()
+	return [username, token]
 
 
 # =====================================================================================================================
@@ -83,9 +75,9 @@ def get_show_chat():
 def connect():
 
 	irc_socket = socket.socket()
-	irc_socket.connect((data[2], data[3]))
-	sock_token = "PASS {}\n".format(data[1])
-	sock_username = "NICK {}\n".format(data[0])
+	irc_socket.connect((server, port))
+	sock_token = "PASS {}\n".format(credentials[1])
+	sock_username = "NICK {}\n".format(credentials[0])
 
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
@@ -168,11 +160,17 @@ def loop(irc_socket):
 									else:
 										print_info("{} tried to launch a raffle in {}!".format(author, channel))
 								elif message[0] == "!join":
-									if author == data[0]:
+									if author == credentials[0]:
 										print_chat(bcolors.YELLOW, channel, author, message)
 										print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
-								elif show_chat is True:
-									print_chat(bcolors.WHITE, channel, author, message)
+								else:
+									try:
+										if config['show_chat'] is True:
+											print_chat(bcolors.WHITE, channel, author, message)
+									except KeyError:
+										print_error(
+											"Can't find 'show_chat' configuration. Is your config.json corrupted? Program will now exit.")
+										exit()
 							else:
 								pass
 								# TODO: Log to file
@@ -217,8 +215,7 @@ if __name__ == "__main__":
 		print_banner()
 
 		config = get_config()
-		data = get_data()
-		show_chat = get_show_chat()
+		credentials = get_credentials()
 		socket = connect()
 
 		print_spacer()
