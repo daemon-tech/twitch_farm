@@ -7,12 +7,14 @@ import subprocess
 import socket
 import sys
 from time import sleep
+import threading
 
 from modules.colors import bcolors
 
 
 SERVER = 'irc.twitch.tv'
 PORT = 6667
+global TIMEOUT
 IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
 subprocess.call('clear', shell=True)
@@ -48,6 +50,11 @@ def print_debug(debug_string):
 			print("{}DEBUG: {}".format(bcolors.CYAN, debug_string))
 	except KeyError:
 		pass
+
+
+def timestamp():
+	x = datetime.datetime.now()
+	return '{}{}'.format(bcolors.WHITE, x.strftime('[%d.%m.%y %H:%M:%S]'))
 
 
 # =====================================================================================================================
@@ -119,6 +126,19 @@ def answer(irc_socket, channel, message):
 	print_debug('Sending message {}'.format(irc_message))
 	irc_socket.send('{}\r\n'.format(irc_message).encode("utf-8"))
 
+def connectivity():
+	global TIMEOUT
+	TIMEOUT = 300
+	while True:
+		sleep(1)
+		TIMEOUT -= 1
+		print_debug('TIMEOUT: {}'.format(TIMEOUT))
+		if TIMEOUT == 0:
+			print_error("Lost connection to the socket. Waiting a few seconds to attempt restart...")
+			sleep(5)
+			os.execv(sys.executable, ['python3'] + [os.path.abspath(sys.argv[0])])
+
+
 
 # =====================================================================================================================
 # Core
@@ -159,6 +179,8 @@ def loop(irc_socket):
 def evaluate_response(response_split):
 	# [PING, SERVER]
 	if response_split[0] == 'PING':
+		global TIMEOUT
+		TIMEOUT = 300
 		send(socket, "PONG", "")
 		print_info("Pong Send.")
 	#[SERVER, 001, username, welcome message]
@@ -253,6 +275,9 @@ if __name__ == "__main__":
 
 		credentials = get_credentials()
 		socket = connect()
+		t = threading.Thread(target=connectivity)
+		t.daemon = True
+		t.start()
 
 		print_spacer()
 
