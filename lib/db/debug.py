@@ -11,8 +11,8 @@ from time import sleep
 from modules.colors import bcolors
 
 
-server = 'irc.twitch.tv'
-port = 6667
+SERVER = 'irc.twitch.tv'
+PORT = 6667
 
 
 subprocess.call('clear', shell=True)
@@ -40,7 +40,7 @@ def print_error(err_string):
 	print("{}ERROR: {}".format(bcolors.RED, err_string))
 
 def print_debug(debug_string):
-	print("{}DEBUG:\n{}".format(bcolors.CYAN, debug_string))
+	print("{}DEBUG: {}".format(bcolors.CYAN, debug_string))
 
 
 # =====================================================================================================================
@@ -75,14 +75,14 @@ def get_credentials():
 def connect():
 
 	irc_socket = socket.socket()
-	irc_socket.connect((server, port))
-	sock_token = "PASS {}\n".format(credentials[1])
-	sock_username = "NICK {}\n".format(credentials[0])
+	irc_socket.connect((SERVER, PORT))
+	sock_token = "PASS {}\r\n".format(credentials[1])
+	sock_username = "NICK {}\r\n".format(credentials[0])
 
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
 	for i in config['channels']:
-		sock_channel = "JOIN #{}\n".format(i.lower())
+		sock_channel = "JOIN #{}\r\n".format(i.lower())
 		irc_socket.send(sock_channel.encode("utf-8"))
 		print_info("Channel: {} joined.".format(i))
 
@@ -98,8 +98,8 @@ def send(irc_socket, command, message):
 	irc_socket.send(c)
 
 
-def answer(irc_socket, channel_privmsg, message):
-	irc_message = "PRIVMSG {} :{}\r\n".format(channel_privmsg, message).encode("utf-8")
+def answer(irc_socket, channel, message):
+	irc_message = "PRIVMSG {} :{}\r\n".format(channel, message).encode("utf-8")
 	irc_socket.send(irc_message)
 
 
