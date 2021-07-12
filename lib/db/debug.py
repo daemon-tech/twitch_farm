@@ -110,15 +110,15 @@ def receive(irc_socket, buffer_size):
 
 
 def send(irc_socket, command, message):
-	irc_command = "{} {}".format(command, message).encode("utf-8")
+	irc_command = "{} {}".format(command, message)
 	print_debug('Sending command {}'.format(irc_command))
-	irc_socket.send('{}\r\n'.format(irc_command))
+	irc_socket.send('{}\r\n'.format(irc_command).encode("utf-8"))
 
 
 def answer(irc_socket, channel, message):
-	irc_message = "PRIVMSG {} :{}".format(channel, message).encode("utf-8")
+	irc_message = "PRIVMSG {} :{}".format(channel, message)
 	print_debug('Sending message {}'.format(irc_message))
-	irc_socket.send('{}\r\n'.format(irc_message))
+	irc_socket.send('{}\r\n'.format(irc_message).encode("utf-8"))
 
 
 # =====================================================================================================================
