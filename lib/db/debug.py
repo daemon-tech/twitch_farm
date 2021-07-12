@@ -105,8 +105,12 @@ def connect():
 	return irc_socket
 
 
-def receive(irc_socket, buffer_size):
-	return irc_socket.recv(buffer_size).decode("utf-8")
+def receive(irc_socket):
+	try:
+		return irc_socket.recv(4096).decode("utf-8")
+	except UnicodeDecodeError:
+		print_error("'Couldn't decode buffer for whatever reason.")
+		exit()
 
 
 def send(irc_socket, command, message):
@@ -126,12 +130,11 @@ def answer(irc_socket, channel, message):
 
 
 def loop(irc_socket):
-	buffer_size = 4096
 	buffer = ''
 	while True:
 		while True:
 			try:
-				buffer += receive(irc_socket, buffer_size)
+				buffer += receive(irc_socket)
 			except ConnectionResetError:
 				print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
 							" Waiting a few seconds to attempt restart...")
