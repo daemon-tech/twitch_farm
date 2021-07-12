@@ -21,7 +21,10 @@ subprocess.call('clear', shell=True)
 
 def init_update():
 	if os.path.basename(__file__) == 'main.py':
-		pass # TODO: Auto-Update using Git
+		print_debug('Filename is main.py, attempting auto-update...')
+		# TODO: Auto-Update using Git
+	else:
+		print_debug('Filename is debug.py, skipping auto-update.')
 
 
 def print_banner():
@@ -41,7 +44,11 @@ def print_error(err_string):
 	print("{}ERROR: {}".format(bcolors.RED, err_string))
 
 def print_debug(debug_string):
-	print("{}DEBUG: {}".format(bcolors.CYAN, debug_string))
+	try:
+		if config['debug']:
+			print("{}DEBUG: {}".format(bcolors.CYAN, debug_string))
+	except KeyError:
+		pass
 
 
 # =====================================================================================================================
@@ -66,6 +73,12 @@ def get_credentials():
 		print_error("Credentials not exist or are entered incorrectly. Program will now exit.")
 		exit()
 
+	print_debug('Username is {}'.format(username))
+	if not token.startswith('oauth:'):
+		print_debug('Token did not start with "oauth:". Prepended it...')
+		token = 'oauth:{}'.format(token)
+	print_debug('Token ends with {}'.format(token[:3]))
+
 	return [username, token]
 
 
@@ -75,6 +88,7 @@ def get_credentials():
 
 def connect():
 
+	print_debug('Establishing socket connection towards {}:{}...'.format(SERVER, PORT))
 	irc_socket = socket.socket()
 	irc_socket.connect((SERVER, PORT))
 
@@ -83,8 +97,9 @@ def connect():
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
 
-	for i in config['channels']:
-		sock_channel = "JOIN #{}\r\n".format(i.lower())
+	for channel in config['channels']:
+		sock_channel = "JOIN #{}\r\n".format(channel.lower())
+		print_debug('Requesting to join channel #{}...'.format(channel))
 		irc_socket.send(sock_channel.encode("utf-8"))
 
 	return irc_socket
@@ -95,13 +110,15 @@ def receive(irc_socket, buffer_size):
 
 
 def send(irc_socket, command, message):
-	irc_command = "{} {}\r\n".format(command, message).encode("utf-8")
-	irc_socket.send(irc_command)
+	irc_command = "{} {}".format(command, message).encode("utf-8")
+	print_debug('Sending command {}'.format(irc_command))
+	irc_socket.send('{}\r\n'.format(irc_command))
 
 
 def answer(irc_socket, channel, message):
-	irc_message = "PRIVMSG {} :{}\r\n".format(channel, message).encode("utf-8")
-	irc_socket.send(irc_message)
+	irc_message = "PRIVMSG {} :{}".format(channel, message).encode("utf-8")
+	print_debug('Sending message {}'.format(irc_message))
+	irc_socket.send('{}\r\n'.format(irc_message))
 
 
 # =====================================================================================================================
@@ -124,6 +141,7 @@ def loop(irc_socket):
 
 		if buffer is not None:
 			responses = buffer.split("\r\n")
+			print_debug('responses:\n{}\n'.format(responses))
 
 			for i, response in enumerate(responses):
 				# if not last response in responses:
@@ -131,7 +149,7 @@ def loop(irc_socket):
 					# remove response from buffer
 					buffer = buffer[len(response)+2:]
 					response_split = response.split()
-					print_debug(response_split)
+					print_debug('response_split: {}'.format(response_split))
 
 					if response_split:
 						# if not starting with ":" and ending with "tmi.twitch.tv" (Begin of a new IRC message):
@@ -160,9 +178,12 @@ def evaluate_response(response_split):
 		channel = response_split[2]
 		author = response_split[0][1:].split('!')[0]
 		message = parse_message(response_split)
+		print_debug('message: {}'.format(message))
 		evaluate_message(channel, author, message)
-	elif not response_split[1] in IGNORED_COMMANDS:
-		print(response_split[1])
+	elif response_split[1] in IGNORED_COMMANDS:
+		print_debug('Ignored response.')
+	else:
+		pass
 		# TODO Log this shit
 
 
@@ -170,6 +191,7 @@ def evaluate_response(response_split):
 def parse_message(response_split):
 	# Remove /me or the Column at the first word
 	if response_split[3] == ':\x01ACTION':
+		print_debug('Message included formatting using /me. Cleaning up...')
 		message = response_split[4:]
 		message[len(message) - 1] = message[len(message) - 1][:-1]
 	else:
@@ -231,10 +253,10 @@ def is_live(channel):
 
 if __name__ == "__main__":
 	try:
+		config = get_config()
 		init_update()
 		print_banner()
 
-		config = get_config()
 		credentials = get_credentials()
 		socket = connect()
 
