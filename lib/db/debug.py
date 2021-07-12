@@ -4,7 +4,6 @@ import os
 from pyfiglet import Figlet
 from random import randint
 import requests
-import subprocess
 import socket
 import sys
 from time import sleep
