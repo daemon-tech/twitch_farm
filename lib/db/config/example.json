@@ -5,19 +5,19 @@
 	},
 	"channels": {
 		"PureFallen": {
-			"show_chat": true,
+			"show_chat": true
 		},
 		"daem0nnnn": {
-			"show_chat": false,
+			"show_chat": false
 		},
 		"ROSHTEIN": {
-			"show_chat": true,
+			"show_chat": true
 		},
 		"DeuceAce": {
-			"show_chat": true,
+			"show_chat": true
 		},
 		"VonDice": {
-			"show_chat": true,
+			"show_chat": true
 		}
 	},
 	"debug": false,
