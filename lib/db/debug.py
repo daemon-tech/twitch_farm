@@ -185,7 +185,7 @@ def evaluate_response(response_split):
 		send(socket, "PONG", "")
 		print_info("Pong Send.")
 	#[SERVER, 001, username, welcome message]
-	if response_split[1] == '001':
+	elif response_split[1] == '001':
 		print_info("Login successful.")
 	#[username.server, JOIN, channel]
 	elif response_split[1] == '353':
