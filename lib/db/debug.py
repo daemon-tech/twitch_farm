@@ -6,6 +6,7 @@ import re
 import requests
 import subprocess
 import socket
+import sys
 from time import sleep
 
 from modules.colors import bcolors
@@ -116,9 +117,9 @@ def loop(irc_socket):
 				buffer += receive(irc_socket, buffer_size)
 			except ConnectionResetError:
 				print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
-							"Waiting a few seconds to attempt auto-reconnect...")
+							"Waiting a few seconds to attempt restart...")
 				sleep(5)
-				irc_socket = connect()
+				os.execv(sys.argv[0], sys.argv)
 			break
 
 		if buffer is not None:
