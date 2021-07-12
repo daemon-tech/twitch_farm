@@ -117,12 +117,11 @@ def answer(irc_socket, channel_privmsg, message):
 
 def loop(irc_socket):
 	buffer_size = 4096
+	buffer = ''
 	while True:
-		buffer = ''
-
 		while True:
 			try:
-				buffer = receive(irc_socket, buffer_size)
+				buffer += receive(irc_socket, buffer_size)
 			except ConnectionResetError:
 				print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
 							"Waiting a few seconds to attempt auto-reconnect...")
@@ -133,48 +132,50 @@ def loop(irc_socket):
 		if buffer is not None:
 			responses = buffer.split("\r\n")
 
-			for response in responses:
-				#print_debug(response)
-				response_split = response.split()
+			for i, response in enumerate(responses):
+				if not i == len(responses)-1:
+					buffer = buffer[len(response)+2:]
+					response_split = response.split()
+					print_debug(response_split)
 
-				if response_split:
-					if not re.match('^:.*tmi\.twitch\.tv', response_split[0]):
-						buffer_size *= 2
-						print_info('Buffer-size exhausted. Increasing to {}...'.format(buffer_size))
-					else:
-						if response_split[0] == 'PING':
-							send(socket, "PONG", "")
-							print_info("Pong Send.")
-						elif response_split[1] == '001':
-							print_info("Login successful.")
-						elif response_split[1] == 'PRIVMSG':
-							channel = response_split[2]
-							author = response_split[0][1:].split('!')[0]
-							message = parse_message(response_split)
-
-							if message[0] == "funnymomentspog":
-								print_chat(bcolors.GREEN, channel, author, message)
-							elif message[0] == "!sraffle":
-								if channel[1:] == author:
-									if is_live(channel):
-										print_chat(bcolors.YELLOW, channel, author, message)
-										print("{}Valid Raffle detected in {}! Trying to participate..."
-											  .format(bcolors.LIGHT_GREEN, channel))
-										sleep(randint(30, 55))
-										answer(socket, channel, '!join')
-									else:
-										print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
-								else:
-									print_info("{} tried to launch a raffle in {}!".format(author, channel))
-							elif message[0] == "!join":
-								if author == data[0]:
-									print_chat(bcolors.YELLOW, channel, author, message)
-									print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
-							elif show_chat is True:
-								print_chat(bcolors.WHITE, channel, author, message)
+					if response_split:
+						if not re.match('^:.*tmi\.twitch\.tv', response_split[0]):
+							buffer_size *= 2
+							print_info('Buffer-size exhausted. Increasing to {}...'.format(buffer_size))
 						else:
-							pass
-							# TODO: Log to file
+							if response_split[0] == 'PING':
+								send(socket, "PONG", "")
+								print_info("Pong Send.")
+							elif response_split[1] == '001':
+								print_info("Login successful.")
+							elif response_split[1] == 'PRIVMSG':
+								channel = response_split[2]
+								author = response_split[0][1:].split('!')[0]
+								message = parse_message(response_split)
+
+								if message[0] == "funnymomentspog":
+									print_chat(bcolors.GREEN, channel, author, message)
+								elif message[0] == "!sraffle":
+									if channel[1:] == author:
+										if is_live(channel):
+											print_chat(bcolors.YELLOW, channel, author, message)
+											print("{}Valid Raffle detected in {}! Trying to participate..."
+												  .format(bcolors.LIGHT_GREEN, channel))
+											sleep(randint(30, 55))
+											answer(socket, channel, '!join')
+										else:
+											print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
+									else:
+										print_info("{} tried to launch a raffle in {}!".format(author, channel))
+								elif message[0] == "!join":
+									if author == data[0]:
+										print_chat(bcolors.YELLOW, channel, author, message)
+										print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
+								elif show_chat is True:
+									print_chat(bcolors.WHITE, channel, author, message)
+							else:
+								pass
+								# TODO: Log to file
 
 
 def parse_message(buffer_split):
