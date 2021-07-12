@@ -44,7 +44,7 @@ def print_error(err_string):
 
 def print_debug(debug_string):
 	try:
-		if config['debug']:
+		if config['debug_output']:
 			print("{}DEBUG: {}".format(bcolors.CYAN, debug_string))
 	except KeyError:
 		pass
@@ -126,7 +126,6 @@ def answer(irc_socket, channel, message):
 
 def loop(irc_socket):
 	buffer = b''
-	buffer_decoded = ''
 	while True:
 		while True:
 			try:
