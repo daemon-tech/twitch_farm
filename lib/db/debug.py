@@ -13,7 +13,7 @@ from modules.colors import bcolors
 
 SERVER = 'irc.twitch.tv'
 PORT = 6667
-
+IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376']
 
 subprocess.call('clear', shell=True)
 
@@ -76,15 +76,15 @@ def connect():
 
 	irc_socket = socket.socket()
 	irc_socket.connect((SERVER, PORT))
+
 	sock_token = "PASS {}\r\n".format(credentials[1])
 	sock_username = "NICK {}\r\n".format(credentials[0])
-
 	irc_socket.send(sock_token.encode("utf-8"))
 	irc_socket.send(sock_username.encode("utf-8"))
+
 	for i in config['channels']:
 		sock_channel = "JOIN #{}\r\n".format(i.lower())
 		irc_socket.send(sock_channel.encode("utf-8"))
-		print_info("Channel: {} joined.".format(i))
 
 	return irc_socket
 
@@ -94,8 +94,8 @@ def receive(irc_socket, buffer_size):
 
 
 def send(irc_socket, command, message):
-	c = "{} {}\r\n".format(command, message).encode("utf-8")
-	irc_socket.send(c)
+	irc_command = "{} {}\r\n".format(command, message).encode("utf-8")
+	irc_socket.send(irc_command)
 
 
 def answer(irc_socket, channel, message):
@@ -125,66 +125,87 @@ def loop(irc_socket):
 			responses = buffer.split("\r\n")
 
 			for i, response in enumerate(responses):
+				# if not last response in responses:
 				if not i == len(responses)-1:
+					# remove response from buffer
 					buffer = buffer[len(response)+2:]
 					response_split = response.split()
 					print_debug(response_split)
 
 					if response_split:
+						# if not starting with ":" and ending with "tmi.twitch.tv" (Begin of a new IRC message):
 						if not re.match('^:.*tmi\.twitch\.tv', response_split[0]):
 							buffer_size *= 2
 							print_info('Buffer-size exhausted. Increasing to {}...'.format(buffer_size))
+							buffer = ''
 						else:
-							if response_split[0] == 'PING':
-								send(socket, "PONG", "")
-								print_info("Pong Send.")
-							elif response_split[1] == '001':
-								print_info("Login successful.")
-							elif response_split[1] == 'PRIVMSG':
-								channel = response_split[2]
-								author = response_split[0][1:].split('!')[0]
-								message = parse_message(response_split)
-
-								if message[0] == "funnymomentspog":
-									print_chat(bcolors.GREEN, channel, author, message)
-								elif message[0] == "!sraffle":
-									if channel[1:] == author:
-										if is_live(channel):
-											print_chat(bcolors.YELLOW, channel, author, message)
-											print("{}Valid Raffle detected in {}! Trying to participate..."
-												  .format(bcolors.LIGHT_GREEN, channel))
-											sleep(randint(30, 55))
-											answer(socket, channel, '!join')
-										else:
-											print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
-									else:
-										print_info("{} tried to launch a raffle in {}!".format(author, channel))
-								elif message[0] == "!join":
-									if author == credentials[0]:
-										print_chat(bcolors.YELLOW, channel, author, message)
-										print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
-								else:
-									try:
-										if config['show_chat'] is True:
-											print_chat(bcolors.WHITE, channel, author, message)
-									except KeyError:
-										print_error(
-											"Can't find 'show_chat' configuration. Is your config.json corrupted? Program will now exit.")
-										exit()
-							else:
-								pass
-								# TODO: Log to file
+							evaluate_response(response_split)
 
 
-def parse_message(buffer_split):
+def evaluate_response(response_split):
+	#[PING, SERVER]
+	if response_split[0] == 'PING':
+		send(socket, "PONG", "")
+		print_info("Pong Send.")
+	#[SERVER, 001, username, welcome message]
+	elif response_split[1] == '001':
+		print_info("Login successful.")
+	#[username.server, JOIN, channel]
+	elif response_split[1] == 'JOIN':
+		print_info("Requesting to join channel {}...".format(response_split[2]))
+	#[username.server, 353, username, =, channel, :username]
+	elif response_split[1] == '353':
+		print_info("Joined channel {}.".format(response_split[4]))
+	#[username.server, PRIVMSG, channel, :message, ...]
+	elif response_split[1] == 'PRIVMSG':
+		channel = response_split[2]
+		author = response_split[0][1:].split('!')[0]
+		message = parse_message(response_split)
+		evaluate_message(channel, author, message)
+	elif not response_split[1] in IGNORED_COMMANDS:
+		print(response_split[1])
+		# TODO Log this shit
+
+
+
+def parse_message(response_split):
 	# Remove /me or the Column at the first word
-	if buffer_split[3] == ':\x01ACTION':
-		message = buffer_split[4:]
+	if response_split[3] == ':\x01ACTION':
+		message = response_split[4:]
 		message[len(message) - 1] = message[len(message) - 1][:-1]
 	else:
-		message = buffer_split[3:]
+		message = response_split[3:]
 		message[0] = message[0][1:]
 	return message
+
+
+def evaluate_message(channel, author, message):
+	if message[0] == "funnymomentspog":
+		print_chat(bcolors.GREEN, channel, author, message)
+	elif message[0] == "!sraffle":
+		if channel[1:] == author:
+			if is_live(channel):
+				print_chat(bcolors.YELLOW, channel, author, message)
+				print("{}Valid Raffle detected in {}! Trying to participate..."
+					  .format(bcolors.LIGHT_GREEN, channel))
+				sleep(randint(30, 55))
+				answer(socket, channel, '!join')
+			else:
+				print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
+		else:
+			print_info("{} tried to launch a raffle in {}!".format(author, channel))
+	elif message[0] == "!join":
+		if author == credentials[0]:
+			print_chat(bcolors.YELLOW, channel, author, message)
+			print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
+	else:
+		try:
+			if config['show_chat'] is True:
+				print_chat(bcolors.WHITE, channel, author, message)
+		except KeyError:
+			print_error(
+				"Can't find 'show_chat' configuration. Is your config.json corrupted? Program will now exit.")
+			exit()
 
 
 def print_chat(color, channel, username, message):
