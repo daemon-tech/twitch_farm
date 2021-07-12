@@ -276,7 +276,7 @@ def parse_message(response_split):
 def evaluate_message(channel, author, message):
 	if message[0] == "funnymomentspog":
 		print_chat(bcolors.GREEN, channel, author, message)
-	elif message[0] == "!sraffle" or "!raffle":
+	elif message[0] == "!sraffle" or message[0] == "!raffle":
 		if channel[1:] == author:
 			if is_live(channel):
 				print_chat(bcolors.PURPLE, channel, author, message)
