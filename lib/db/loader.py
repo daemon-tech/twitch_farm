@@ -7,9 +7,9 @@ config = json.load(config_file)
 try:
 	try:
 
-		if config['debug']:
+		if config['quickstart']:
 			os.system("python3 lib/db/debug.py")
-		elif not config['debug']:
+		elif not config['quickstart']:
 			os.system("python3 lib/db/main.py")
 
 	except KeyError:

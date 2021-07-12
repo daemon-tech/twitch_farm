@@ -2,7 +2,6 @@ import json
 import os
 from pyfiglet import Figlet
 from random import randint
-import re
 import requests
 import subprocess
 import socket
@@ -105,8 +104,8 @@ def connect():
 	return irc_socket
 
 
-def receive(irc_socket, buffer_size):
-	return irc_socket.recv(buffer_size).decode("utf-8")
+def receive(irc_socket):
+	return irc_socket.recv(4096)
 
 
 def send(irc_socket, command, message):
@@ -126,47 +125,43 @@ def answer(irc_socket, channel, message):
 
 
 def loop(irc_socket):
-	buffer_size = 4096
-	buffer = ''
+	buffer = b''
+	buffer_decoded = ''
 	while True:
 		while True:
 			try:
-				buffer += receive(irc_socket, buffer_size)
+				buffer += receive(irc_socket)
+				print_debug('buffer:\n{}\n'.format(buffer))
 			except ConnectionResetError:
 				print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
-							"Waiting a few seconds to attempt restart...")
+							" Waiting a few seconds to attempt restart...")
 				sleep(5)
-				os.execv(sys.argv[0], sys.argv)
-			break
+				os.execv(sys.executable, ['python3'] + [os.path.abspath(sys.argv[0])])
+			try:
+				buffer_decoded = buffer.decode('utf-8')
+				break
+			except UnicodeDecodeError:
+				pass
 
-		if buffer is not None:
-			responses = buffer.split("\r\n")
+		if buffer_decoded is not None:
+			responses = buffer_decoded.split("\r\n")
 			print_debug('responses:\n{}\n'.format(responses))
 
 			for i, response in enumerate(responses):
 				# if not last response in responses:
 				if not i == len(responses)-1:
-					# remove response from buffer
-					buffer = buffer[len(response)+2:]
+					# remove response from buffer_decoded
+					buffer = buffer[len(response.encode('utf-8'))+2:]
 					response_split = response.split()
 					print_debug('response_split: {}'.format(response_split))
-
-					if response_split:
-						# if not starting with ":" and ending with "tmi.twitch.tv" (Begin of a new IRC message):
-						if not re.match('^:.*tmi\.twitch\.tv', response_split[0]):
-							# [PING, SERVER]
-							if response_split[0] == 'PING':
-								send(socket, "PONG", "")
-								print_info("Pong Send.")
-							else:
-								buffer_size *= 2
-								print_info('Buffer-size exhausted. Increasing to {}...'.format(buffer_size))
-								buffer = ''
-						else:
-							evaluate_response(response_split)
+					evaluate_response(response_split)
 
 
 def evaluate_response(response_split):
+	# [PING, SERVER]
+	if response_split[0] == 'PING':
+		send(socket, "PONG", "")
+		print_info("Pong Send.")
 	#[SERVER, 001, username, welcome message]
 	if response_split[1] == '001':
 		print_info("Login successful.")
