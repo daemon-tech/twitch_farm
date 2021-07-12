@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 from pyfiglet import Figlet
@@ -39,15 +40,15 @@ def print_spacer():
 	print(" ")
 
 def print_info(info_string):
-	print("{}INFO:{} {}".format(bcolors.PURPLE, bcolors.WHITE, info_string))
+	print("{}{}[INFO]  {}{}".format(bcolors.PURPLE, timestamp(), bcolors.WHITE, info_string))
 
 def print_error(err_string):
-	print("{}ERROR: {}".format(bcolors.RED, err_string))
+	print("{}{}[ERROR] {}".format(bcolors.RED, timestamp(), err_string))
 
 def print_debug(debug_string):
 	try:
 		if config['debug_output']:
-			print("{}DEBUG: {}".format(bcolors.CYAN, debug_string))
+			print("{}{}[DEBUG] {}".format(bcolors.CYAN, timestamp(), debug_string))
 	except KeyError:
 		pass
 
@@ -246,7 +247,7 @@ def evaluate_message(channel, author, message):
 
 
 def print_chat(color, channel, username, message):
-	irc_string = "{}{} {}: ".format(color, channel, username)
+	irc_string = "{}{} {} {}: ".format(color, timestamp(), channel, username)
 	for element in message:
 		irc_string += element + " "
 	print(irc_string)
@@ -280,7 +281,6 @@ if __name__ == "__main__":
 		t.start()
 
 		print_spacer()
-
 		loop(socket)
 
 	except KeyboardInterrupt:
