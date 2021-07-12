@@ -8,7 +8,7 @@ import subprocess
 import socket
 import sys
 from time import sleep
-import threading
+from threading import Thread
 
 from modules.colors import bcolors
 
@@ -55,7 +55,7 @@ def print_debug(debug_string):
 
 def timestamp():
 	x = datetime.datetime.now()
-	return '{}{}'.format(bcolors.WHITE, x.strftime('[%d.%m.%y %H:%M:%S]'))
+	return x.strftime('[%d.%m.%y %H:%M:%S]')
 
 
 # =====================================================================================================================
@@ -276,7 +276,7 @@ if __name__ == "__main__":
 
 		credentials = get_credentials()
 		socket = connect()
-		t = threading.Thread(target=connectivity)
+		t = Thread(target=connectivity)
 		t.daemon = True
 		t.start()
 
