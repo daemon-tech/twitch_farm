@@ -15,17 +15,17 @@
 	  "ignored_words": []
 	},
 	"ROSHTEIN": {
-	  "show_chat": false,
+	  "show_chat": true,
 	  "ignored_users": [],
 	  "ignored_words": []
 	},
 	"DeuceAce": {
-	  "show_chat": false,
+	  "show_chat": true,
 	  "ignored_users": [],
 	  "ignored_words": []
 	},
 	"VonDice": {
-	  "show_chat": false,
+	  "show_chat": true,
 	  "ignored_users": [],
 	  "ignored_words": []
 	}
