@@ -2,6 +2,7 @@ import json
 import os
 from pyfiglet import Figlet
 from random import randint
+import re
 import requests
 import subprocess
 import socket
@@ -96,8 +97,8 @@ def connect():
 	return irc_socket
 
 
-def receive(irc_socket):
-	return irc_socket.recv(4096).decode("utf-8")
+def receive(irc_socket, buffer_size):
+	return irc_socket.recv(buffer_size).decode("utf-8")
 
 
 def send(irc_socket, command, message):
@@ -114,59 +115,69 @@ def answer(irc_socket, channel_privmsg, message):
 # Core
 
 
-def loop():
+def loop(irc_socket):
+	buffer_size = 4096
 	while True:
 		buffer = ''
-		try:
-			buffer = receive(socket)
-		except ConnectionResetError:
-			print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
-						"The program will now exit.")
-			exit()
+
+		while True:
+			try:
+				buffer = receive(irc_socket, buffer_size)
+			except ConnectionResetError:
+				print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
+							"Waiting a few seconds to attempt auto-reconnect...")
+				sleep(5)
+				irc_socket = connect()
+			break
 
 		if buffer is not None:
-			buffer_split = buffer.split()
+			responses = buffer.split("\r\n")
 
-			#print_debug(buffer_split)
+			for response in responses:
+				#print_debug(response)
+				response_split = response.split()
 
-			if buffer_split[0] == 'PING':
-				send(socket, "PONG", "")
-				print_info("Pong Send.")
-			else:
-				channel = buffer_split[2]
-				author = buffer_split[0][1:].split('!')[0]
+				if response_split:
+					if not re.match('^:.*tmi\.twitch\.tv', response_split[0]):
+						buffer_size *= 2
+						print_info('Buffer-size exhausted. Increasing to {}...'.format(buffer_size))
+					else:
+						if response_split[0] == 'PING':
+							send(socket, "PONG", "")
+							print_info("Pong Send.")
+						elif response_split[1] == '001':
+							print_info("Login successful.")
+						elif response_split[1] == 'PRIVMSG':
+							channel = response_split[2]
+							author = response_split[0][1:].split('!')[0]
+							message = parse_message(response_split)
 
-				if buffer_split[1] == 'PRIVMSG':
-					message = get_message(buffer_split)
-
-					if message[0] == "funnymomentspog":
-						print_chat(bcolors.GREEN, channel, author, message)
-					elif message[0] == "!sraffle":
-						if channel[1:] == author:
-							if is_live(channel):
-								print_chat(bcolors.YELLOW, channel, author, message)
-								print("{}Valid Raffle detected in {}! Trying to participate..."
-									  .format(bcolors.LIGHT_GREEN, channel))
-								sleep(randint(30, 55))
-								answer(socket, channel, '!join')
-							else:
-								print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
+							if message[0] == "funnymomentspog":
+								print_chat(bcolors.GREEN, channel, author, message)
+							elif message[0] == "!sraffle":
+								if channel[1:] == author:
+									if is_live(channel):
+										print_chat(bcolors.YELLOW, channel, author, message)
+										print("{}Valid Raffle detected in {}! Trying to participate..."
+											  .format(bcolors.LIGHT_GREEN, channel))
+										sleep(randint(30, 55))
+										answer(socket, channel, '!join')
+									else:
+										print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
+								else:
+									print_info("{} tried to launch a raffle in {}!".format(author, channel))
+							elif message[0] == "!join":
+								if author == data[0]:
+									print_chat(bcolors.YELLOW, channel, author, message)
+									print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
+							elif show_chat is True:
+								print_chat(bcolors.WHITE, channel, author, message)
 						else:
-							print_info("{} tried to launch a raffle in {}!".format(author, channel))
-					elif message[0] == "!join":
-						if author == data[0]:
-							print_chat(bcolors.YELLOW, channel, author, message)
-							print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
-					elif show_chat is True:
-						print_chat(bcolors.WHITE, channel, author, message)
-				elif buffer_split[1] == '001':
-					print_info("Login successful.")
-				else:
-					pass
-					# TODO: Log to file
+							pass
+							# TODO: Log to file
 
 
-def get_message(buffer_split):
+def parse_message(buffer_split):
 	# Remove /me or the Column at the first word
 	if buffer_split[3] == ':\x01ACTION':
 		message = buffer_split[4:]
@@ -211,7 +222,7 @@ if __name__ == "__main__":
 
 		print_spacer()
 
-		loop()
+		loop(socket)
 
 	except KeyboardInterrupt:
 		print(bcolors.YELLOW + "\nProgram closed by user (CTRL+C)")
