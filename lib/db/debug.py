@@ -19,7 +19,7 @@ IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
 global TIMEOUT
 
-subprocess.call('clear', shell=True)
+os.system("clear")
 
 
 def init_update():
