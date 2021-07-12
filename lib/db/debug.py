@@ -135,20 +135,21 @@ def loop(irc_socket):
 					if response_split:
 						# if not starting with ":" and ending with "tmi.twitch.tv" (Begin of a new IRC message):
 						if not re.match('^:.*tmi\.twitch\.tv', response_split[0]):
-							buffer_size *= 2
-							print_info('Buffer-size exhausted. Increasing to {}...'.format(buffer_size))
-							buffer = ''
+							# [PING, SERVER]
+							if response_split[0] == 'PING':
+								send(socket, "PONG", "")
+								print_info("Pong Send.")
+							else:
+								buffer_size *= 2
+								print_info('Buffer-size exhausted. Increasing to {}...'.format(buffer_size))
+								buffer = ''
 						else:
 							evaluate_response(response_split)
 
 
 def evaluate_response(response_split):
-	#[PING, SERVER]
-	if response_split[0] == 'PING':
-		send(socket, "PONG", "")
-		print_info("Pong Send.")
 	#[SERVER, 001, username, welcome message]
-	elif response_split[1] == '001':
+	if response_split[1] == '001':
 		print_info("Login successful.")
 	#[username.server, JOIN, channel]
 	elif response_split[1] == 'JOIN':
