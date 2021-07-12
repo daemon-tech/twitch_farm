@@ -92,6 +92,7 @@ def get_credentials():
 
 def get_sets():
 	channel_set_ = set()
+	channel_color_dict_ = dict()
 	user_set_ = set()
 	word_set_ = set()
 
@@ -102,11 +103,11 @@ def get_sets():
 					# Using the channel loop to create a list of all channels which allow
 					try:
 						if config['channels'][channel]['show_chat']:
-							channel_set_.add(channel.lower())
+							channel_show(channel, channel_set_, channel_color_dict_)
 					except KeyError:
 						print_info('Missing key "show_chat" for channel {} in config.json.'
 								   'Assumes "True"...'.format(channel))
-						channel_set_.add(channel.lower())
+						channel_show(channel, channel_set_, channel_color_dict_)
 			except KeyError:
 				print_error("Can't find global 'show_chat' key. Is your config.json corrupted? Program will now exit.")
 				exit()
@@ -127,7 +128,20 @@ def get_sets():
 	except KeyError:
 		pass
 
-	return channel_set_, user_set_, word_set_
+	return channel_set_, user_set_, word_set_, channel_color_dict_
+
+
+def channel_show(channel, channel_set_, channel_color_dict_):
+	channel_set_.add(channel.lower())
+	try:
+		if config['channels'][channel]['channel_color']:
+			try:
+				channel_color_dict_[channel.lower()] = eval('bcolors.{}'
+															.format(config['channels'][channel]['channel_color']))
+			except AttributeError:
+				pass
+	except KeyError:
+		pass
 
 
 # =====================================================================================================================
@@ -265,8 +279,8 @@ def evaluate_message(channel, author, message):
 	elif message[0] == "!sraffle":
 		if channel[1:] == author:
 			if is_live(channel):
-				print_chat(bcolors.YELLOW, channel, author, message)
-				print("{}Valid Raffle detected in {}! Trying to participate..."
+				print_chat(bcolors.PURPLE, channel, author, message)
+				print_info("{}Valid Raffle detected in {}! Trying to participate..."
 					  .format(bcolors.LIGHT_GREEN, channel))
 				s = Thread(target=send_random, args=(30, 55, channel, '!join'))
 				s.daemon = True
@@ -275,24 +289,29 @@ def evaluate_message(channel, author, message):
 				print_info("{} tried to launch a raffle, but he is currently offline!".format(author))
 		else:
 			print_info("{} tried to launch a raffle in {}!".format(author, channel))
-	elif message[0] == "!join":
-		if author == credentials[0]:
-			print_chat(bcolors.YELLOW, channel, author, message)
-			print("{}Successfully joined raffle in {}! Good luck!".format(bcolors.LIGHT_GREEN, channel))
 	else:
 		if config['show_chat'] is True:
 			if channel[1:] in channel_set:
 				if not message[0].lower() in word_set:
 					if not author in user_set:
-						print_chat(bcolors.WHITE, channel, author, message)
+						if not channel_color_dict[channel[1:]] == '':
+							print_chat_c_color(channel_color_dict[channel[1:]], channel, bcolors.WHITE, author, message)
+						else:
+							print_chat(bcolors.WHITE, channel, author, message)
 					else:
 						print_debug('Message was by ignored user. Skipping...')
 				else:
 					print_debug('Message started with an ignored word. Skipping...')
 
 
-def print_chat(color, channel, username, message):
-	irc_string = "{}{} {} {}: ".format(timestamp(), color,  channel, username)
+def print_chat_c_color(channel_color, channel, color, author, message):
+	irc_string = "{}{} {} {}{}: ".format(timestamp(), channel_color, channel, color, author)
+	for element in message:
+		irc_string += element + " "
+	print(irc_string)
+
+def print_chat(color, channel, author, message):
+	irc_string = "{} {}{} {}: ".format(timestamp(), color, channel, author)
 	for element in message:
 		irc_string += element + " "
 	print(irc_string)
@@ -326,7 +345,7 @@ if __name__ == "__main__":
 		print_banner()
 
 		credentials = get_credentials()
-		channel_set, user_set, word_set = get_sets()
+		channel_set, user_set, word_set, channel_color_dict = get_sets()
 		socket = connect()
 		c = Thread(target=connectivity)
 		c.daemon = True

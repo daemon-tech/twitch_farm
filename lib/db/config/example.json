@@ -5,19 +5,24 @@
 	},
 	"channels": {
 		"PureFallen": {
-			"show_chat": true
+			"show_chat": true,
+			"channel_color": "PURPLE"
 		},
 		"daem0nnnn": {
-			"show_chat": false
+			"show_chat": false,
+			"channel_color": "LIGHT_GREEN"
 		},
 		"ROSHTEIN": {
-			"show_chat": true
+			"show_chat": true,
+			"channel_color": "YELLOW"
 		},
 		"DeuceAce": {
-			"show_chat": true
+			"show_chat": true,
+			"channel_color": "BLUE"
 		},
 		"VonDice": {
-			"show_chat": true
+			"show_chat": true,
+			"channel_color": "GREEN"
 		}
 	},
 	"debug": false,
