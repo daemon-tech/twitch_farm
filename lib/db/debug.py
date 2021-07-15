@@ -59,7 +59,7 @@ def print_error(err_string):
 		pass'''
 
 
-print_debug = lambda debug_string: [print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))] if not config['debug_output'] else print('ERROR: L56')
+print_debug = lambda debug_string: [print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))] if config['debug_output'] else print("", end="")
 
 
 def timestamp():
