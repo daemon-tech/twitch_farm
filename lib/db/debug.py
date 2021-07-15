@@ -18,8 +18,8 @@ IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
 global TIMEOUT
 
-os.system("clear")
-
+command = lambda x: os.system(x)
+command("clear")
 
 def init_update():
 	if os.path.basename(__file__) == 'main.py':
@@ -45,12 +45,15 @@ def print_info(info_string):
 def print_error(err_string):
 	print("{}{}[ERROR] {}".format(timestamp(), bcolors.RED,  err_string))
 
-def print_debug(debug_string):
+'''def print_debug(debug_string):
 	try:
 		if config['debug_output']:
 			print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))
 	except KeyError:
-		pass
+		pass'''
+
+
+print_debug = lambda debug_string: [print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))] if config['debug_output'] else print('ERROR: L56')
 
 
 def timestamp():
@@ -63,15 +66,14 @@ def timestamp():
 
 
 def get_config():
-	# Error Handling already happened in launcher
+	#Error Handling already happened in launcher
 	config_file = open('lib/db/config/config.json')
 
 	return json.load(config_file)
 
-
 def get_credentials():
-	username=''
-	token=''
+	username = ''
+	token = ''
 
 	try:
 		username = config['credentials']['username']
