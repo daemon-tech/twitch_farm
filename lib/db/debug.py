@@ -16,10 +16,16 @@ SERVER = 'irc.twitch.tv'
 PORT = 6667
 IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
+
 global TIMEOUT
+
 
 command = lambda x: os.system(x)
 command("clear")
+
+
+closing = lambda string: print(bcolors.YELLOW + "\n{}".format(string))
+
 
 def init_update():
 	if os.path.basename(__file__) == 'main.py':
@@ -53,7 +59,7 @@ def print_error(err_string):
 		pass'''
 
 
-print_debug = lambda debug_string: [print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))] if config['debug_output'] else print('ERROR: L56')
+print_debug = lambda debug_string: [print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))] if not config['debug_output'] else print('ERROR: L56')
 
 
 def timestamp():
@@ -356,5 +362,6 @@ if __name__ == "__main__":
 		loop(socket)
 
 	except KeyboardInterrupt:
-		print(bcolors.YELLOW + "\nProgram closed by user (CTRL+C)")
+		closing("Program closed by user (CTRL+C)")
+		#print(bcolors.YELLOW + "\nProgram closed by user (CTRL+C)")
 		exit()
