@@ -51,13 +51,6 @@ def print_info(info_string):
 def print_error(err_string):
 	print("{}{}[ERROR] {}".format(timestamp(), bcolors.RED,  err_string))
 
-'''def print_debug(debug_string):
-	try:
-		if config['debug_output']:
-			print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))
-	except KeyError:
-		pass'''
-
 
 print_debug = lambda debug_string: [print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))] if config['debug_output'] else print("", end="")
 
