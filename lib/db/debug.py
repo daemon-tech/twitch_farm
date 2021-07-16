@@ -24,9 +24,6 @@ command = lambda x: os.system(x)
 command("clear")
 
 
-closing = lambda string: print(bcolors.YELLOW + "\n{}".format(string))
-
-
 def init_update():
 	if os.path.basename(__file__) == 'main.py':
 		print_debug('Filename is main.py, attempting auto-update...')
@@ -45,11 +42,14 @@ def print_spacer():
 	print(bcolors.WHITE + ":::..:::::..::::::::..:::::..::..:::::..::..:::::..::........::..:::::..::")
 	print(" ")
 
-def print_info(info_string):
-	print("{}{}[INFO]  {}{}".format(timestamp(), bcolors.PURPLE, bcolors.WHITE, info_string))
 
-def print_error(err_string):
-	print("{}{}[ERROR] {}".format(timestamp(), bcolors.RED,  err_string))
+closing = lambda string: print(bcolors.YELLOW + "\n{}".format(string))
+
+
+print_info = lambda info_string: print("{}{}[INFO]  {}{}".format(timestamp(), bcolors.PURPLE, bcolors.WHITE, info_string))
+
+
+print_error = lambda err_string: print("{}{}[ERROR] {}".format(timestamp(), bcolors.RED,  err_string))
 
 
 print_debug = lambda debug_string: [print("{}{}[DEBUG] {}".format(timestamp(), bcolors.CYAN,  debug_string))] if config['debug_output'] else print("", end="")
