@@ -17,7 +17,8 @@ IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
 global TIMEOUT
 
-os.system("clear")
+command = lambda x: os.system(x)
+command("clear")
 
 
 # =====================================================================================================================
@@ -25,7 +26,7 @@ os.system("clear")
 
 
 def get_config():
-	# Error Handling already happened in launcher
+	#Error Handling already happened in launcher
 	config_file = open('lib/db/config/config.json')
 
 	return json.load(config_file)
