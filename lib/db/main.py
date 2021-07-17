@@ -13,6 +13,7 @@ from modules import util
 
 SERVER = 'irc.twitch.tv'
 PORT = 6667
+CONFIG_FILE = 'lib/db/config/config.json'
 IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
 global TIMEOUT
@@ -27,14 +28,12 @@ command("clear")
 
 def get_config():
 	#Error Handling already happened in launcher
-	config_file = open('lib/db/config/config.json')
-
-	return json.load(config_file)
+	return json.load(open(CONFIG_FILE))
 
 
 def get_credentials():
-	username_= ''
-	token_=''
+	username_ = ''
+	token_ = ''
 
 	try:
 		username_ = config['credentials']['username']
@@ -53,9 +52,13 @@ def get_credentials():
 
 
 def get_sets():
+	# Set of all channels normal print_chat's are enabled for
 	channel_set_ = set()
+	# Dictionary with channels attached with individual channel colors
 	channel_color_dict_ = dict()
+	# Set of users which are ignored for normal print_chat´s
 	user_set_ = set()
+	# Set of words which are ignored for normal print_chat's
 	word_set_ = set()
 
 	try:
@@ -70,7 +73,8 @@ def get_sets():
 								   'Assumes "True"...'.format(channel))
 						add_channel_color(channel, channel_set_, channel_color_dict_)
 			except KeyError:
-				util.print_error("Can't find global 'show_chat' key. Is your config.json corrupted? Program will now exit.")
+				util.print_error("Can't find global 'show_chat' key. Is your config.json corrupted?"
+								 "Program will now exit.")
 				exit()
 	except KeyError:
 		util.print_error('Could not find key "channels". Is your config.json corrupted?'
@@ -102,6 +106,7 @@ def add_channel_color(channel, channel_set_, channel_color_dict_):
 			except AttributeError:
 				raise KeyError
 	except KeyError:
+		# Assigns no channel color towards the channel, detected on the print_chat.
 		channel_color_dict_[channel.lower()] = ''
 
 
@@ -117,15 +122,16 @@ def loop(irc_socket):
 				buffer += irc_socket.receive()
 				util.print_debug('buffer:\n{}\n'.format(buffer), config)
 			except ConnectionResetError:
-				util.print_error("Connection was reset by Twitch. This may happen when you restarted the program to quickly."
-							" Waiting a few seconds to attempt restart...")
+				util.print_error("Connection was reset by Twitch."
+								 "This may happen when you restarted the program to quickly."
+								 "Waiting a few seconds to attempt restart...")
 				sleep(5)
 				os.execv(sys.executable, ['python3'] + [os.path.abspath(sys.argv[0])])
 			try:
 				buffer_decoded = buffer.decode('utf-8')
 				break
 			except UnicodeDecodeError:
-				#An unicode symbol was split over 2 different buffers. Keep current buffer and receive again.
+				# An unicode symbol was split over 2 different buffers. Keep current buffer and receive again.
 				pass
 
 		if buffer_decoded is not None:
@@ -133,9 +139,9 @@ def loop(irc_socket):
 			util.print_debug('responses:\n{}\n'.format(responses), config)
 
 			for i, response in enumerate(responses):
-				# if not last response in responses:
+				# Excluding the last response to handle cut-off responses.
 				if not i == len(responses)-1:
-					# remove response from buffer_decoded
+					# remove response from buffer_decoded.
 					buffer = buffer[len(response.encode('utf-8'))+2:]
 					response_split = response.split()
 					util.print_debug('response_split: {}'.format(response_split), config)
@@ -149,13 +155,13 @@ def evaluate_response(response_split, irc_socket):
 		TIMEOUT = 300
 		irc_socket.send("PONG", "", config)
 		util.print_info("Pong Send.")
-	#[SERVER, 001, username, welcome message]
+	# [SERVER, 001, username, welcome message]
 	elif response_split[1] == '001':
 		util.print_info("Login successful.")
-	#[username.server, JOIN, channel]
+	# [username.server, JOIN, channel]
 	elif response_split[1] == '353':
 		util.print_info("Joined channel {}.".format(response_split[4]))
-	#[username.server, PRIVMSG, channel, :message, ...]
+	# [username.server, PRIVMSG, channel, :message, ...]
 	elif response_split[1] == 'PRIVMSG':
 		channel = response_split[2]
 		author = response_split[0][1:].split('!')[0]
@@ -167,7 +173,6 @@ def evaluate_response(response_split, irc_socket):
 	else:
 		util.print_error('Found Unknown IRC Command with Status-Code {}. If you see this message, please report this'
 					'accident to the developers.\nresponse_split: {}'.format(response_split[1], response_split))
-
 
 
 def parse_message(response_split):
@@ -185,7 +190,7 @@ def parse_message(response_split):
 def evaluate_message(channel, author, message, irc_socket):
 	if message[0] == "funnymomentspog":
 		connection.print_chat(BColors.GREEN, channel, author, message)
-	elif message[0] == "!sraffle" or message[0] == "!raffle":
+	elif message[0] == "!sraffle" or message[0] == "!raffle" or message[0] == '!mraffle':
 		if channel[1:] == author:
 			if is_live(channel):
 				connection.print_chat(BColors.PURPLE, channel, author, message)
@@ -203,6 +208,7 @@ def evaluate_message(channel, author, message, irc_socket):
 			if channel[1:] in channel_set:
 				if not message[0].lower() in word_set:
 					if not author in user_set:
+						# Checks if channel has a channel color
 						if not channel_color_dict[channel[1:]] == '':
 							connection.print_chat_c_color(
 								channel_color_dict[channel[1:]], channel, BColors.WHITE, author, message)
@@ -222,7 +228,8 @@ def is_live(channel):
 	elif format(thumbnail.history) == '[<Response [302]>]':
 		return False
 	else:
-		util.print_error("Unknown Status Code when checking thumbnail:\n{}\nThe raffle was skipped as security measurement."
+		util.print_error("Unknown Status Code when checking thumbnail:\n{}\n"
+						 "The raffle was skipped as security measurement."
 					.format(format(thumbnail.history)))
 
 
