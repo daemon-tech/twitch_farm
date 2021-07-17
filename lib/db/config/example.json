@@ -26,7 +26,6 @@
 		}
 	},
 	"debug": false,
-	"debug_output": false,
 	"show_chat": true,
 	"ignored_users": ["StreamElements", "TheAlphaBrian", "MrSatchels", "TheDeuceBag", "VonDiceBot"],
 	"ignored_words": ["roshSatchel", "roshGold", "daSafe", "daGold", "Puntos", "!join"],

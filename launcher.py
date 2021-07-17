@@ -6,7 +6,7 @@ def load():
 	subprocess.call('clear', shell=True)
 
 	try:
-		from lib.db.modules.colors import bcolors
+		from lib.db.modules.colors import BColors
 	except ModuleNotFoundError:
 		print("lib/db/modules/colors.py seems missing. Did you install this program correctly?")
 		exit()
@@ -51,7 +51,7 @@ def start_main():
 		config = json.load(config_file)
 
 		if config['quickstart']:
-			os.system("python3 lib/db/loader.py")
+			os.system("python3 lib/db/main.py")
 		elif not config['quickstart']:
 			start_menue()
 
@@ -69,7 +69,7 @@ def start_menue():
 	print("Modules correctly installed. Starting session?")
 	start = input("[y/n]")
 	if start == "y" or start == "Y":
-		os.system("python3 lib/db/loader.py")
+		os.system("python3 lib/db/main.py")
 
 
 

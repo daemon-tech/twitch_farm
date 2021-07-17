@@ -1,2 +1,0 @@
-VERSION = "1.0.0"
-TITLE = "TFARM Version " + VERSION
