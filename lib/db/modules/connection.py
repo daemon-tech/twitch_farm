@@ -5,18 +5,19 @@ import socket
 import sys
 
 from .colors import BColors
+from .config import Config
 from . import util
 
 global TIMEOUT
 
 
-def watchdog(config):
+def watchdog():
 	global TIMEOUT
 	TIMEOUT = 300
 	while True:
 		sleep(1)
 		TIMEOUT -= 1
-		util.print_debug('TIMEOUT: {}'.format(TIMEOUT), config)
+		util.print_debug('TIMEOUT: {}'.format(TIMEOUT))
 		if TIMEOUT == 0:
 			util.print_error("Lost connection to the socket. Waiting a few seconds to attempt restart...")
 			sleep(5)
@@ -38,8 +39,8 @@ def print_chat(color, channel, author, message):
 
 
 class IRCSocket:
-	def __init__(self, server, port, username, token, config):
-		util.print_debug('Establishing socket connection towards {}:{}...'.format(server, port), config)
+	def __init__(self, server, port, username, token):
+		util.print_debug('Establishing socket connection towards {}:{}...'.format(server, port))
 		irc_socket = socket.socket()
 		irc_socket.connect((server, port))
 
@@ -48,9 +49,9 @@ class IRCSocket:
 		irc_socket.send(sock_token.encode("utf-8"))
 		irc_socket.send(sock_username.encode("utf-8"))
 
-		for channel in config['channels']:
+		for channel in Config.CONFIG_OBJECT['channels']:
 			sock_channel = "JOIN #{}\r\n".format(channel.lower())
-			util.print_debug('Requesting to join channel #{}...'.format(channel), config)
+			util.print_debug('Requesting to join channel #{}...'.format(channel))
 			irc_socket.send(sock_channel.encode("utf-8"))
 
 		self.irc_socket = irc_socket
@@ -61,19 +62,19 @@ class IRCSocket:
 		return self.irc_socket.recv(4096)
 
 
-	def send(self, command, message, config):
+	def send(self, command, message):
 		irc_command = "{} {}".format(command, message)
-		util.print_debug('Sending command {}'.format(irc_command), config)
+		util.print_debug('Sending command {}'.format(irc_command))
 		self.irc_socket.send('{}\r\n'.format(irc_command).encode("utf-8"))
 
 
 	def send_random(self, early, late, channel, message):
 		sleep(randint(early, late))
-		self.answer(socket, channel, message)
+		self.answer(channel, message)
 		print_chat(BColors.LIGHT_GREEN, channel, self.username, message)
 
 
-	def answer(self, channel, message, config):
+	def answer(self, channel, message):
 		irc_message = "PRIVMSG {} :{}".format(channel, message)
-		util.print_debug('Sending message {}'.format(irc_message), config)
+		util.print_debug('Sending message {}'.format(irc_message))
 		self.irc_socket.send('{}\r\n'.format(irc_message).encode("utf-8"))

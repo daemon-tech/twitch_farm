@@ -1,4 +1,3 @@
-import json
 import os
 import requests
 import sys
@@ -6,6 +5,7 @@ from time import sleep
 from threading import Thread
 
 from modules.colors import BColors
+from modules.config import Config
 from modules import connection
 from modules.connection import IRCSocket
 from modules import util
@@ -13,7 +13,6 @@ from modules import util
 
 SERVER = 'irc.twitch.tv'
 PORT = 6667
-CONFIG_FILE = 'lib/db/config/config.json'
 IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
 global TIMEOUT
@@ -24,11 +23,6 @@ command("clear")
 
 # =====================================================================================================================
 # DATA GATHERING
-
-
-def get_config():
-	#Error Handling already happened in launcher
-	return json.load(open(CONFIG_FILE))
 
 
 def get_credentials():
@@ -42,11 +36,11 @@ def get_credentials():
 		util.print_error("Credentials not exist or are entered incorrectly. Program will now exit.")
 		exit()
 
-	util.print_debug('Username is {}'.format(username_), config)
+	util.print_debug('Username is {}'.format(username_))
 	if not token_.startswith('oauth:'):
-		util.print_debug('Token did not start with "oauth:". Prepended it...', config)
+		util.print_debug('Token did not start with "oauth:". Prepended it...')
 		token_ = 'oauth:{}'.format(token_)
-	util.print_debug('Token ends with {}'.format(token_[:3]), config)
+	util.print_debug('Token ends with {}'.format(token_[:3]))
 
 	return [username_, token_]
 
@@ -120,7 +114,7 @@ def loop(irc_socket):
 		while True:
 			try:
 				buffer += irc_socket.receive()
-				util.print_debug('buffer:\n{}\n'.format(buffer), config)
+				util.print_debug('buffer:\n{}\n'.format(buffer))
 			except ConnectionResetError:
 				util.print_error("Connection was reset by Twitch."
 								 "This may happen when you restarted the program to quickly."
@@ -136,7 +130,7 @@ def loop(irc_socket):
 
 		if buffer_decoded is not None:
 			responses = buffer_decoded.split("\r\n")
-			util.print_debug('responses:\n{}\n'.format(responses), config)
+			util.print_debug('responses:\n{}\n'.format(responses))
 
 			for i, response in enumerate(responses):
 				# Excluding the last response to handle cut-off responses.
@@ -144,7 +138,7 @@ def loop(irc_socket):
 					# remove response from buffer_decoded.
 					buffer = buffer[len(response.encode('utf-8'))+2:]
 					response_split = response.split()
-					util.print_debug('response_split: {}'.format(response_split), config)
+					util.print_debug('response_split: {}'.format(response_split))
 					evaluate_response(response_split, irc_socket)
 
 
@@ -153,7 +147,7 @@ def evaluate_response(response_split, irc_socket):
 	if response_split[0] == 'PING':
 		global TIMEOUT
 		TIMEOUT = 300
-		irc_socket.send("PONG", "", config)
+		irc_socket.send("PONG", "")
 		util.print_info("Pong Send.")
 	# [SERVER, 001, username, welcome message]
 	elif response_split[1] == '001':
@@ -166,10 +160,10 @@ def evaluate_response(response_split, irc_socket):
 		channel = response_split[2]
 		author = response_split[0][1:].split('!')[0]
 		message = parse_message(response_split)
-		util.print_debug('message: {}'.format(message), config)
+		util.print_debug('message: {}'.format(message))
 		evaluate_message(channel, author, message, irc_socket)
 	elif response_split[1] in IGNORED_COMMANDS:
-		util.print_debug('Ignored response.', config)
+		util.print_debug('Ignored response.')
 	else:
 		util.print_error('Found Unknown IRC Command with Status-Code {}. If you see this message, please report this'
 					'accident to the developers.\nresponse_split: {}'.format(response_split[1], response_split))
@@ -178,7 +172,7 @@ def evaluate_response(response_split, irc_socket):
 def parse_message(response_split):
 	# Remove /me or the Column at the first word
 	if response_split[3] == ':\x01ACTION':
-		util.print_debug('Message included formatting using /me. Cleaning up...', config)
+		util.print_debug('Message included formatting using /me. Cleaning up...')
 		message = response_split[4:]
 		message[len(message) - 1] = message[len(message) - 1][:-1]
 	else:
@@ -215,9 +209,9 @@ def evaluate_message(channel, author, message, irc_socket):
 						else:
 							connection.print_chat(BColors.WHITE, channel, author, message)
 					else:
-						util.print_debug('Message was by ignored user. Skipping...', config)
+						util.print_debug('Message was by ignored user. Skipping...')
 				else:
-					util.print_debug('Message started with an ignored word. Skipping...', config)
+					util.print_debug('Message started with an ignored word. Skipping...')
 
 
 def is_live(channel):
@@ -238,18 +232,18 @@ def is_live(channel):
 
 if __name__ == "__main__":
 	try:
-		config = get_config()
+		config = Config.CONFIG_OBJECT
 		username, token = get_credentials()
 		channel_set, user_set, word_set, channel_color_dict = get_sets()
 		util.print_banner()
 
-		IRCSocket = IRCSocket(SERVER, PORT, username, token, config)
-		util.print_debug('Entered Watchdog.', config)
-		# Calling with connection.watchdog(config) causes single-threading
-		wd = Thread(target=connection.watchdog, args=(config,))
+		IRCSocket = IRCSocket(SERVER, PORT, username, token)
+		util.print_debug('Entered Watchdog.')
+		# Calling with "connection.watchdog()" causes single-threading
+		wd = Thread(target=connection.watchdog)
 		wd.daemon = True
 		wd.start()
-		util.print_debug('Left Watchdog', config)
+		util.print_debug('Left Watchdog')
 		util.print_spacer()
 
 		loop(IRCSocket)
