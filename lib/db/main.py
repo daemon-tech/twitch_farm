@@ -245,6 +245,7 @@ if __name__ == "__main__":
 
 		IRCSocket = IRCSocket(SERVER, PORT, username, token, config)
 		util.print_debug('Entered Watchdog.', config)
+		# Calling with connection.watchdog(config) causes single-threading
 		wd = Thread(target=connection.watchdog, args=(config,))
 		wd.daemon = True
 		wd.start()
