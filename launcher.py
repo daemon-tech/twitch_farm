@@ -3,7 +3,7 @@ import subprocess
 
 #check modules
 def load():
-	subprocess.call('clear', shell=True)
+	os.system("clear")
 
 	try:
 		from lib.db.modules.colors import BColors
@@ -43,7 +43,7 @@ def load():
 
 
 def start_main():
-	# Needs to be imported in start_rain() to ensure previous ModuleNotFoundError-check
+	# Needs to be imported in start_main() to ensure previous ModuleNotFoundError-check
 	import json
 
 	try:

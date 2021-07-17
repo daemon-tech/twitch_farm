@@ -12,3 +12,6 @@ config.json
 
 #
 *.swp
+
+#test folder
+test/
