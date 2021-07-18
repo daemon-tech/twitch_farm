@@ -15,8 +15,6 @@ SERVER = 'irc.twitch.tv'
 PORT = 6667
 IGNORED_COMMANDS = ['002', '003', '004', '366', '372', '375', '376', 'JOIN']
 
-global TIMEOUT
-
 command = lambda x: os.system(x)
 command("clear")
 
@@ -145,8 +143,7 @@ def loop(irc_socket):
 def evaluate_response(response_split, irc_socket):
 	# [PING, SERVER]
 	if response_split[0] == 'PING':
-		global TIMEOUT
-		TIMEOUT = 300
+		connection.TIMEOUT = 300
 		irc_socket.send("PONG", "")
 		util.print_info("Pong Send.")
 	# [SERVER, 001, username, welcome message]
