@@ -1,4 +1,4 @@
-# twitch_farm
+# Twitch_Farm
 Join Twitch Chats, farm Activity Points in several bots and participate in Raffles!
 
 ## How to use
@@ -13,3 +13,6 @@ Join Twitch Chats, farm Activity Points in several bots and participate in Raffl
 - Add `https://localhost` as Redirect URI. If that doesn't work for whatever reason, add `http://localhost` as well and Twitch will allow you to safe both
 - Visit `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=<YOUR_CLIENT_ID>&redirect_uri=http://localhost&scope=chat:read+chat:edit+whispers:read+whispers:edit&state=frontend|dkZud25INzhpWFEzWVFxY3lpQ0tMZz09&force_verify=true`, replacing `<YOUR_CLIENT_ID>` with the Client ID of the application you just created
 - After accepting the connection with Twitch you will redirected to a localhost. The connection will fail, but the URL in your browser will include the token you need for the script.
+
+
+### OUTDATED
