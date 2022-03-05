@@ -15,4 +15,4 @@ Join Twitch Chats, farm Activity Points in several bots and participate in Raffl
 - After accepting the connection with Twitch you will redirected to a localhost. The connection will fail, but the URL in your browser will include the token you need for the script.
 
 
-### OUTDATED
+### OUTDATED 05/03/2022 due to Twitch changes
